@@ -3,7 +3,6 @@ session_start();
 include("dbconnect.php");
 date_default_timezone_set("Asia/Kuala_Lumpur");
 
-
 $customer_code=""; 
 if(isset($_SESSION['customer_code']))
 { 
