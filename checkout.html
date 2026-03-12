@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Mookhuthi Palace</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Montserrat:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --mp-black: #0b0b0c;
+            --mp-brown: #1a0f0a;
+            --mp-gold: #d4af37;
+            --mp-gold-soft: #e6c76a;
+            --mp-surface: rgba(255, 255, 255, .06);
+            --mp-border: rgba(212, 175, 55, .25);
+            --mp-text: rgba(255, 255, 255, .88);
+            --mp-muted: rgba(255, 255, 255, .68);
+            --gold-primary: #D4AF37;
+            --gold-dark: #B8860B;
+            --dark-bg: #1a1a1a;
+            --dark-card: #2d2d2d;
+            --gold-light: #F4E4C1;
+            --accent-brown: #3d2817;
+            --text-light: #f5f5f5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Trebuchet MS', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d1f15 50%, #1a1a1a 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+        }
+
+        .cart-icon-wrapper {
+            position: relative;
+        }
+
+        .cart-icon-wrapper a {
+            position: relative;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            border: 2px solid var(--mp-black);
+        }
+
+        /* Toggle Switch Styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-label {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            border-radius: 28px;
+            border: 1px solid var(--mp-border);
+        }
+
+        .toggle-label::before {
+            content: '';
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 3px;
+            background-color: var(--mp-gold);
+            transition: all 0.3s ease;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked+.toggle-label {
+            background-color: rgba(212, 175, 55, 0.3);
+        }
+
+        .toggle-switch input:checked+.toggle-label::before {
+            transform: translateX(22px);
+        }
+
+        /* Navigation Bar */
+        .navbar-custom {
+            background: linear-gradient(90deg, var(--mp-black) 0%, rgba(26, 15, 10, 0.9) 50%, var(--mp-black) 100%);
+            backdrop-filter: blur(10px);
+            border-bottom: 0.5px solid var(--mp-border);
+            padding: 1rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+            box-shadow: 0 8px 32px rgba(212, 175, 55, 0.08);
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--mp-gold), var(--mp-gold-soft));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+            text-decoration: none;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand:hover {
+            filter: brightness(1.1);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-menu li a {
+            color: var(--mp-text);
+            text-decoration: none;
+            padding: 0.75rem 1.25rem;
+            display: block;
+            transition: all 0.3s ease;
+            position: relative;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .nav-menu li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--mp-gold), var(--mp-gold-soft));
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-menu li a:hover::after {
+            width: calc(100% - 2.5rem);
+        }
+
+        .nav-menu li a:hover {
+            color: var(--mp-gold-soft);
+        }
+
+        .nav-icons {
+            display: flex;
+            gap: 1rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            align-items: center;
+        }
+
+        .nav-icons a {
+            color: var(--mp-gold);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--mp-surface);
+            text-decoration: none;
+        }
+
+        .nav-icons a:hover {
+            color: var(--mp-gold-soft);
+            background: rgba(212, 175, 55, 0.15);
+            transform: scale(1.1);
+        }
+
+        .collection-option {
+            position: relative;
+        }
+
+        .collection-option input[type="radio"] {
+            accent-color: var(--mp-gold);
+        }
+
+        .collection-option:hover {
+            border-color: var(--mp-gold) !important;
+            background: rgba(212, 175, 55, 0.12) !important;
+            transform: translateX(4px);
+        }
+
+        .collection-option input[type="radio"]:checked + div {
+            color: var(--mp-gold);
+        }
+
+        .gapicon {
+            margin-left: 20px;
+        }
+
+        .toggle-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 7px;
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            margin-left: -5px;
+        }
+
+        .toggle-menu span {
+            width: 35px;
+            height: 4px;
+            background: var(--mp-gold);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border-radius: 2px;
+            display: block;
+        }
+
+        .toggle-menu.active span:nth-child(1) {
+            transform: rotate(45deg) translate(12px, 12px);
+        }
+
+        .toggle-menu.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .toggle-menu.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            max-width: 300px;
+            height: 100vh;
+            background: linear-gradient(180deg, var(--mp-black) 0%, var(--mp-brown) 100%);
+            border-right: 0.5px solid var(--mp-border);
+            transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 1040;
+            padding-top: 80px;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .side-menu.active {
+            left: 0;
+        }
+
+        .side-menu ul {
+            list-style: none;
+            padding: 1rem 0;
+            margin: 0;
+        }
+
+        .side-menu ul li {
+            border-bottom: 0.5px solid var(--mp-border);
+        }
+
+        .side-menu ul li a {
+            color: var(--mp-text);
+            text-decoration: none;
+            display: block;
+            padding: 1rem 1.5rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 1.5rem;
+            margin-top: 12px;
+        }
+
+        .side-menu ul li a:hover {
+            color: var(--mp-gold-soft);
+            background: var(--mp-surface);
+            padding-left: 2rem;
+        }
+
+        .side-menu-icons {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-top: 0.5px solid var(--mp-border);
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .side-menu-icons a {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--mp-gold);
+            background: var(--mp-surface);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .side-menu-icons a:hover {
+            color: var(--mp-gold-soft);
+            background: rgba(212, 175, 55, 0.15);
+            transform: scale(1.1);
+        }
+
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+            z-index: 1030;
+        }
+
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .nav-desktop {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .toggle-menu {
+                display: flex;
+            }
+
+            .nav-desktop {
+                display: none !important;
+            }
+
+            .navbar-custom {
+                padding: 1rem;
+            }
+
+            .navbar-brand {
+                font-size: 1.4rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+
+            .nav-icons a {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(61, 40, 23, 0.2) 100%);
+            padding: 2rem 0;
+            border-bottom: 2px solid var(--gold-primary);
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--gold-light), var(--gold-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(212, 175, 55, 0.2);
+            z-index: 0;
+        }
+
+        .progress-line.active {
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+        }
+
+        .step {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            flex: 1;
+        }
+
+        .step-number {
+            width: 80px;
+            height: 80px;
+            background: rgba(212, 175, 55, 0.1);
+            border: 3px solid var(--gold-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: var(--gold-primary);
+            transition: all 0.3s ease;
+        }
+
+        .step.active .step-number {
+            background: var(--gold-primary);
+            color: var(--dark-bg);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+        }
+
+        .step-name {
+            font-weight: 700;
+            color: #bbb;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .step.active .step-name {
+            color: var(--gold-primary);
+        }
+
+        /* Forms
+        .checkout-container {
+            padding: 2rem 0;
+        } */
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gold-primary);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--gold-primary);
+        }
+
+        .form-section {
+            background: linear-gradient(135deg, rgba(240, 223, 168, 0.05) 0%, rgba(61, 40, 23, 0.1) 100%);
+            border: 1px solid var(--gold-primary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            color: var(--gold-light);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        .form-control {
+            background: #2a2a2a;
+            border: 1px solid var(--gold-primary);
+            color: #fff;
+            padding: 0.9rem 1rem;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-control option {
+            background: #2a2a2a;
+            color: #fff;
+        }
+
+        .form-control::placeholder {
+            color: #d4af37;
+        }
+
+        .form-control:focus {
+            outline: #D4AF37;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+            border-color: var(--gold-light);
+            color: #fbcb62;
+        }
+
+        /* Prevent autofill and typing from changing text color to black */
+        .form-control:-webkit-autofill,
+        .form-control:-webkit-autofill:hover,
+        .form-control:-webkit-autofill:focus,
+        .form-control:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px rgba(255, 255, 255, 0.05) inset !important;
+            -webkit-text-fill-color: #fbcb62 !important;
+        }
+
+        input:-webkit-autofill {
+            -webkit-text-fill-color: #fbcb62 !important;
+        }
+
+        /* Branch Radio Button Styling */
+        label[style*="display: flex"][style*="align-items: center"][style*="padding: 1rem"] input[type="radio"] {
+            accent-color: var(--gold-primary);
+        }
+
+        label[style*="display: flex"][style*="align-items: center"][style*="padding: 1rem"]:hover {
+            background: #333 !important;
+            border-color: var(--gold-light) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+        }
+
+        label[style*="display: flex"][style*="align-items: center"][style*="padding: 1rem"] input[type="radio"]:checked+span {
+            color: var(--gold-light);
+            font-weight: 600;
+        }
+
+
+
+        /* Radio Options */
+        .option-group {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-card {
+            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid var(--gold-primary);
+            border-radius: 10px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .option-card:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateX(10px);
+        }
+
+        .option-card.active {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: var(--gold-light);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .option-radio {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--gold-primary);
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .option-radio::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            background: var(--gold-primary);
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .option-card.active .option-radio::after {
+            opacity: 1;
+        }
+
+        .option-content h4 {
+            color: var(--gold-light);
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .option-content p {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .option-price {
+            margin-left: auto;
+            color: var(--gold-primary);
+            font-weight: 700;
+        }
+
+        /* Order Summary */
+        .order-summary {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(61, 40, 23, 0.1) 100%);
+            border: 1px solid var(--gold-primary);
+            border-radius: 12px;
+            padding: 2rem;
+            position: sticky;
+            top: 120px;
+            height: fit-content;
+        }
+
+        .summary-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--gold-primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            color: #ddd;
+        }
+
+        .summary-item.total {
+            border-bottom: 2px solid var(--gold-primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .summary-item.total .label {
+            color: var(--gold-primary);
+        }
+
+        .summary-item.total .value {
+            color: var(--gold-light);
+            font-size: 1.3rem;
+        }
+
+        .item-image {
+            width: 60px;
+            height: 60px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .order-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+
+        }
+
+        .order-item-details {
+            flex: 1;
+        }
+
+        .order-item-name {
+            color: var(--gold-primary);
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .order-item-meta {
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        .order-item-price {
+            color: var(--gold-light);
+            font-weight: 700;
+            text-align: right;
+        }
+
+        /* Buttons */
+        .btn-place-order {
+            width: 100%;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: var(--dark-bg) !important;
+            border: none;
+            padding: 1.2rem;
+            font-weight: 700;
+            font-size: 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .btn-place-order:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-back {
+            width: 100%;
+            background: transparent;
+            border: 2px solid var(--gold-primary);
+            color: var(--gold-primary);
+            padding: 0.8rem;
+            font-weight: 700;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            text-transform: uppercase;
+            height: 55px;
+        }
+
+        .btn-back:hover {
+            background: var(--gold-primary);
+            color: var(--dark-bg);
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
+            border-top: 2px solid var(--gold-primary);
+            padding: 3rem 0 1rem;
+            margin-top: 5rem;
+        }
+
+        .footer-section h5 {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold-primary);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-section ul li a {
+            color: #bbb;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .footer-section ul li a:hover {
+            color: var(--gold-primary);
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .footer-connect {
+            text-align: center;
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-connect h5 {
+            color: var(--mp-gold-soft);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--gold-primary);
+            border-radius: 50%;
+            margin-right: 0.8rem;
+            transition: all 0.3s ease;
+            border: 2px solid var(--gold-primary);
+        }
+
+        .social-links a:hover {
+            background: var(--gold-primary);
+            color: var(--dark-bg);
+            transform: translateY(-5px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+            padding-top: 2rem;
+            margin-top: 2rem;
+            text-align: center;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .copyright {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 1.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .progress-steps {
+                margin-bottom: 2rem;
+            }
+
+            .step-number {
+                width: 60px;
+                height: 60px;
+                font-size: 1.2rem;
+            }
+
+            .order-summary {
+                position: relative;
+                top: auto;
+                margin-top: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar-custom">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand"><img src="img/mookuthi-palace-logo.png" width="100"></a>
+
+            <!-- Desktop Navigation -->
+            <div class="nav-desktop">
+                <ul class="nav-menu">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="products.html">Shop Online</a></li>
+                    <li><a href="about.html">Our Story</a></li>
+                    <li><a href="branches.html">Branches</a></li>
+                </ul>
+            </div>
+
+            <!-- Nav Icons & Toggle -->
+            <div style="display: flex; align-items: center; gap: 1rem; flex-shrink: 0;">
+                <ul class="nav-icons">
+                    <li class="cart-icon-wrapper">
+                        <a href="cart.html" title="Cart">
+                            <i class="bi bi-handbag fa-2x"></i>
+                            <span class="cart-badge">3</span>
+                        </a>
+                    </li>
+                    <li><a href="login.html" title="login" class="gapicon"><i
+                                class="bi bi-person-bounding-box fa-2x"></i></a></li>
+                </ul>
+                <button class="toggle-menu" id="toggleMenu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Side Menu -->
+    <div class="side-menu" id="sideMenu">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="products.html">Shop Online</a></li>
+            <li><a href="about.html">Our Story</a></li>
+            <li><a href="branches.html">Branches</a></li>
+        </ul>
+
+    </div>
+
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1 class="page-title">Secure Checkout</h1>
+        </div>
+    </div>
+
+
+
+    <!-- Checkout Form -->
+    <div class="container checkout-container">
+        <div class="row g-4">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+
+                <!-- Delivery Method -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-truck"></i> Delivery Method
+                    </h3>
+
+                    <div class="option-group">
+                        <div class="option-card active" onclick="selectDelivery(this, 'selfCollect')">
+                            <div class="option-radio"></div>
+                            <div class="option-content" style="flex: 1;">
+                                <h4><i class="fas fa-store"></i> Self Collect</h4>
+                                <p>Pick up at our store (11:00 AM - 6:00 PM)</p>
+                            </div>
+                            <div class="option-price">FREE</div>
+                        </div>
+
+                        <div class="option-card" onclick="selectDelivery(this, 'standard')">
+                            <div class="option-radio"></div>
+                            <div class="option-content" style="flex: 1;">
+                                <h4><i class="fas fa-truck"></i> Standard Delivery</h4>
+                                <p>Delivery in 3-5 business days</p>
+                            </div>
+                            <div class="option-price">RM8.00</div>
+                        </div>
+
+                        <div class="option-card" onclick="selectDelivery(this, 'express')">
+                            <div class="option-radio"></div>
+                            <div class="option-content" style="flex: 1;">
+                                <h4><i class="fas fa-bolt"></i> Singapore Delivery</h4>
+                                <p>Delivery in 1-4 business days</p>
+                            </div>
+                            <div class="option-price">RM18.00</div>
+                        </div>
+
+                        <!--<div class="option-card" onclick="selectDelivery(this, 'overnight')">
+                            <div class="option-radio"></div>
+                            <div class="option-content" style="flex: 1;">
+                                <h4><i class="fas fa-moon"></i> Overnight Delivery</h4>
+                                <p>Delivery next business day</p>
+                            </div>
+                            <div class="option-price">RM 50.00</div>
+                        </div>-->
+                    </div>
+                </div>
+
+                <!-- Self Collect Branch Selection -->
+                <div class="form-section" id="selfCollectSection" style="display: block;">
+                    <h3 class="section-title">
+                        <i class="fas fa-map-marker-alt"></i> Select Collection Point
+                    </h3>
+
+                    <div class="option-group" style="flex-direction: column; gap: 1.5rem;">
+                        <label style="display: flex; align-items: flex-start; gap: 1.5rem; padding: 1.5rem; background: rgba(212, 175, 55, 0.06); border: 2px solid rgba(212, 175, 55, 0.3); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" class="collection-option">
+                            <input type="radio" name="collectBranch" value="kuala-lumpur" style="margin-top: 6px; width: 20px; height: 20px; cursor: pointer;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--mp-gold); margin-bottom: 0.5rem; font-size: 1.1rem;">Mookhuthi Palace Kuala Lumpur</div>
+                                <div style="font-size: 0.95rem; color: var(--mp-muted); line-height: 1.6;">LOT 75-G Medan Bunus, Off Jalan Masjid India, 50100 Kuala Lumpur, WILAYAH PERSEKUTUAN</div>
+                                <div style="font-size: 0.85rem; color: var(--mp-muted); margin-top: 0.75rem;"><i class="fas fa-clock"></i> Operating Hours: 11:00 AM - 6:00 PM Daily</div>
+                            </div>
+                        </label>
+
+                        <label style="display: flex; align-items: flex-start; gap: 1.5rem; padding: 1.5rem; background: rgba(212, 175, 55, 0.06); border: 2px solid rgba(212, 175, 55, 0.3); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" class="collection-option">
+                            <input type="radio" name="collectBranch" value="taiping" style="margin-top: 6px; width: 20px; height: 20px; cursor: pointer;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--mp-gold); margin-bottom: 0.5rem; font-size: 1.1rem;">Mookhuthi Palace Taiping</div>
+                                <div style="font-size: 0.95rem; color: var(--mp-muted); line-height: 1.6;">No. 136, Jalan Pasar, 34000 Taiping, Perak</div>
+                                <div style="font-size: 0.85rem; color: var(--mp-muted); margin-top: 0.75rem;"><i class="fas fa-clock"></i> Operating Hours: 11:00 AM - 6:00 PM Daily</div>
+                            </div>
+                        </label>
+
+                        <label style="display: flex; align-items: flex-start; gap: 1.5rem; padding: 1.5rem; background: rgba(212, 175, 55, 0.06); border: 2px solid rgba(212, 175, 55, 0.3); border-radius: 12px; cursor: pointer; transition: all 0.3s ease;" class="collection-option">
+                            <input type="radio" name="collectBranch" value="ipoh" style="margin-top: 6px; width: 20px; height: 20px; cursor: pointer;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--mp-gold); margin-bottom: 0.5rem; font-size: 1.1rem;">Mookhuthi Palace Ipoh</div>
+                                <div style="font-size: 0.95rem; color: var(--mp-muted); line-height: 1.6;">271, Jalan Silibin, Taman Alkaff, 30100 Ipoh, Perak</div>
+                                <div style="font-size: 0.85rem; color: var(--mp-muted); margin-top: 0.75rem;"><i class="fas fa-clock"></i> Operating Hours: 11:00 AM - 6:00 PM Daily</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Shipping Address -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-map-marker-alt"></i> Billing Address
+                    </h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">First Name *</label>
+                            <input type="text" class="form-control" placeholder="Enter first name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name *</label>
+                            <input type="text" class="form-control" placeholder="Enter last name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email Address *</label>
+                        <input type="email" class="form-control" placeholder="your@email.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Phone Number *</label>
+                        <input type="tel" class="form-control" placeholder="+60 1234567890" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Street Address *</label>
+                        <input type="text" class="form-control" placeholder="House,Condo, Apartment, suite, unit, etc."
+                            required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">City/Town *</label>
+                            <input type="text" class="form-control" placeholder="Enter city" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">State *</label>
+                            <select class="form-control" required>
+                                <option value="">-- Select State --</option>
+                                <option value="Johor">Johor</option>
+                                <option value="Kedah">Kedah</option>
+                                <option value="Kelantan">Kelantan</option>
+                                <option value="Melaka">Melaka</option>
+                                <option value="Negeri Sembilan">Negeri Sembilan</option>
+                                <option value="Pahang">Pahang</option>
+                                <option value="Perak">Perak</option>
+                                <option value="Perlis">Perlis</option>
+                                <option value="Pulau Pinang">Pulau Pinang</option>
+                                <option value="Sabah">Sabah</option>
+                                <option value="Sarawak">Sarawak</option>
+                                <option value="Selangor">Selangor</option>
+                                <option value="Terengganu">Terengganu</option>
+                                <option value="Kuala Lumpur">Kuala Lumpur (FT)</option>
+                                <option value="Putrajaya">Putrajaya (FT)</option>
+                                <option value="Labuan">Labuan (FT)</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Postal Code *</label>
+                            <input type="text" class="form-control" placeholder="Enter postal code" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Country *</label>
+                            <select class="form-control" required>
+                                <option value="">Select Country</option>
+                                <option value="MY">Malaysia</option>
+
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Branch Recommendation Section -->
+                    <div class="form-group"
+                        style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--mp-border);">
+                        <label class="form-label">Which Branch Recommended This Website? *</label>
+                        <p style="color: var(--mp-muted); font-size: 0.9rem; margin-bottom: 1rem;">Please select the
+                            branch that referred you to us</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                            <label
+                                style="display: flex; align-items: center; padding: 1rem; background: #2a2a2a; border: 2px solid #d4af37; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; color: var(--mp-text);">
+                                <input type="radio" name="branch" value="IPOH"
+                                    style="margin-right: 0.75rem; cursor: pointer;" required>
+                                <span>IPOH</span>
+                            </label>
+                            <label
+                                style="display: flex; align-items: center; padding: 1rem; background: #2a2a2a; border: 2px solid #d4af37; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; color: var(--mp-text);">
+                                <input type="radio" name="branch" value="TAIPING"
+                                    style="margin-right: 0.75rem; cursor: pointer;" required>
+                                <span>TAIPING</span>
+                            </label>
+                            <label
+                                style="display: flex; align-items: center; padding: 1rem; background: #2a2a2a; border: 2px solid #d4af37; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; color: var(--mp-text);">
+                                <input type="radio" name="branch" value="KUALA_LUMPUR"
+                                    style="margin-right: 0.75rem; cursor: pointer;" required>
+                                <span>KUALA LUMPUR</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shipping Address Toggle -->
+                <div
+                    style="display: flex; align-items: center; gap: 1rem; margin: 2rem 0 0 0; padding-bottom: 2rem; border-bottom: 1px solid var(--mp-border);">
+                    <label for="shippingToggle" style="margin: 0; font-weight: 500; color: var(--mp-text);">
+                        Shipping Address Different from Billing
+                    </label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="shippingToggle" onchange="toggleShippingAddress()">
+                        <label for="shippingToggle" class="toggle-label"></label>
+                    </div>
+                </div>
+
+                <!-- Shipping Address Section (Hidden by default) -->
+                <div id="shippingAddressSection" class="form-section" style="display: none; margin-top: 2rem;">
+                    <h3 class="section-title">
+                        <i class="fas fa-map-marker-alt"></i> Shipping Address
+                    </h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" class="form-control shipping-input" placeholder="Enter full name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address *</label>
+                            <input type="email" class="form-control shipping-input" placeholder="Enter email address">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Phone Number *</label>
+                            <input type="tel" class="form-control shipping-input" placeholder="Enter phone number">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Address Line 1 *</label>
+                            <input type="text" class="form-control shipping-input" placeholder="Street address">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Address Line 2</label>
+                            <input type="text" class="form-control shipping-input" placeholder="Apartment, suite, etc.">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">City *</label>
+                            <input type="text" class="form-control shipping-input" placeholder="Enter city">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">State *</label>
+                            <select class="form-control shipping-input">
+                                <option value="">-- Select State --</option>
+                                <option value="Johor">Johor</option>
+                                <option value="Kedah">Kedah</option>
+                                <option value="Kelantan">Kelantan</option>
+                                <option value="Melaka">Melaka</option>
+                                <option value="Negeri Sembilan">Negeri Sembilan</option>
+                                <option value="Pahang">Pahang</option>
+                                <option value="Perak">Perak</option>
+                                <option value="Perlis">Perlis</option>
+                                <option value="Pulau Pinang">Pulau Pinang</option>
+                                <option value="Sabah">Sabah</option>
+                                <option value="Sarawak">Sarawak</option>
+                                <option value="Selangor">Selangor</option>
+                                <option value="Terengganu">Terengganu</option>
+                                <option value="Kuala Lumpur">Kuala Lumpur (FT)</option>
+                                <option value="Putrajaya">Putrajaya (FT)</option>
+                                <option value="Labuan">Labuan (FT)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Postal Code *</label>
+                            <input type="text" class="form-control shipping-input" placeholder="Enter postal code">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Country *</label>
+                            <select class="form-control shipping-input">
+                                <option value="">Select Country</option>
+                                <option value="MY">Malaysia</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+              
+
+                <!-- Payment Method -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-credit-card"></i> Payment Method
+                    </h3>
+
+                    <div class="option-group">
+                        <div class="option-card active" onclick="selectPayment(this, 'card')">
+                            <div class="option-radio"></div>
+                            <div class="option-content" style="flex: 1;">
+                                <h4><i class="fas fa-credit-card"></i> Credit/Debit Card</h4>
+                                <p>Visa, MasterCard, Amex</p>
+                            </div>
+                        </div>
+                        <!-- Card Details (shown when card is selected) -->
+                        <div id="cardDetails" style="margin-top: 2rem;">
+                            <div class="form-group">
+                                <label class="form-label">Card Holder Name *</label>
+                                <input type="text" class="form-control" placeholder="Enter cardholder name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Card Number *</label>
+                                <input type="text" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19"
+                                    required>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Expiry Date *</label>
+                                    <input type="text" class="form-control" placeholder="MM/YY" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">CVV *</label>
+                                    <input type="text" class="form-control" placeholder="123" maxlength="3" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="option-card" onclick="selectPayment(this, 'bank')">
+                            <div class="option-radio"></div>
+                            <div class="option-content" style="flex: 1;">
+                                <h4><i class="fas fa-university"></i> Bank Transfer</h4>
+                                <p>Direct bank transfer</p>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 1rem; margin-bottom: 3rem;">
+                    <a href="cart.html" class="btn-back" style="flex: 1;">← Back to Cart</a>
+                    <button class="btn-place-order" style="flex: 1;" onclick="placeOrder()">
+                        <i class="fas fa-lock"></i> Place Order
+                    </button>
+                </div>
+            </div>
+
+            <!-- Order Summary Sidebar -->
+            <div class="col-lg-4">
+                <div class="order-summary">
+                    <h3 class="summary-title">Order Summary</h3>
+
+                    <!-- Items -->
+                    <div class="order-item">
+                        <div class="item-image"><img src="img/m1.jpg" class="img-fluid"></div>
+                        <div class="order-item-details">
+                            <div class="order-item-name">Royal Pearl</div>
+                            <div class="order-item-meta">Qty: 1</div>
+                        </div>
+                        <div class="order-item-price">RM 189.99</div>
+                    </div>
+
+                    <div class="order-item">
+                        <div class="item-image"><img src="img/m2.jpg" class="img-fluid"></div>
+                        <div class="order-item-details">
+                            <div class="order-item-name">Maharaja Gold</div>
+                            <div class="order-item-meta">Qty: 2</div>
+                        </div>
+                        <div class="order-item-price">RM 499.98</div>
+                    </div>
+
+                    <div class="order-item">
+                        <div class="item-image"><img src="img/m1.jpg" class="img-fluid"></div>
+                        <div class="order-item-details">
+                            <div class="order-item-name">Diamond Dazzle</div>
+                            <div class="order-item-meta">Qty: 1</div>
+                        </div>
+                        <div class="order-item-price">RM 219.99</div>
+                    </div>
+
+                    <!-- Totals -->
+                    <div class="summary-item">
+                        <span>Subtotal</span>
+                        <span>RM 909.96</span>
+                    </div>
+
+                    <div class="summary-item">
+                        <span>Shipping</span>
+                        <span id="shippingCost">RM8.00</span>
+                    </div>
+
+                    <div class="summary-item">
+                        <span>Tax</span>
+                        <span>RM 0.00</span>
+                    </div>
+
+                    <div class="summary-item total">
+                        <span class="label">Total</span>
+                        <span class="value" id="totalAmount">RM 909.96</span>
+                    </div>
+
+                    <!-- Security Info -->
+                    <div
+                        style="padding: 1rem; background: rgba(212, 175, 55, 0.1); border-radius: 8px; text-align: center;">
+                        <p style="font-size: 0.85rem; color: #999; margin-bottom: 0.5rem;">
+                            <i class="fas fa-lock"></i> 100% Secure Checkout
+                        </p>
+                        <p style="font-size: 0.8rem; color: #999;">
+                            Your payment information is encrypted and secure
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container ">
+            <div class="footer-connect">
+                <h5>Connect With Us</h5>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>© <span>Copyright</span>
+                    <script> document.write(new Date().getFullYear())  </script>
+                    <span class="copyright">Mookhuthi Palace (M) Sdn. Bhd. </span>202501029797 (1631209-P) | <span>All
+                        rights reserved. | Privacy Policy |
+                        Terms & Conditions</span>
+                </p>
+                <div class="credits"> Designed by <a href="https://webprodesign.my/"><span class="white">
+                            WebPro Design</span></a> </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedDelivery = 'standard';
+        let selectedPayment = 'card';
+
+        // Toggle Shipping Address Section
+        function toggleShippingAddress() {
+            const shippingSection = document.getElementById('shippingAddressSection');
+            const shippingInputs = document.querySelectorAll('.shipping-input');
+            const toggle = document.getElementById('shippingToggle');
+
+            if (toggle.checked) {
+                shippingSection.style.display = 'block';
+                // Make shipping inputs required
+                shippingInputs.forEach(input => {
+                    if (input.type !== 'email' && input.type !== 'tel' && input.getAttribute('placeholder') !== 'Apartment, suite, etc.') {
+                        input.setAttribute('required', 'required');
+                    }
+                });
+            } else {
+                shippingSection.style.display = 'none';
+                // Remove required attribute
+                shippingInputs.forEach(input => {
+                    input.removeAttribute('required');
+                    input.value = '';
+                });
+            }
+        }
+
+        function selectDelivery(element, type) {
+            document.querySelectorAll('[onclick^="selectDelivery"]').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            selectedDelivery = type;
+
+            // Show/hide Self Collect section
+            const selfCollectSection = document.getElementById('selfCollectSection');
+            if (type === 'selfCollect') {
+                selfCollectSection.style.display = 'block';
+            } else {
+                selfCollectSection.style.display = 'none';
+            }
+
+            let cost = 'FREE';
+            if (type === 'standard') cost = 'RM 8.00';
+            if (type === 'express') cost = 'RM 18.00';
+            if (type === 'overnight') cost = 'RM 50.00';
+
+            document.getElementById('shippingCost').textContent = cost;
+            updateTotal();
+        }
+
+        function selectPayment(element, type) {
+            document.querySelectorAll('[onclick^="selectPayment"]').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            selectedPayment = type;
+
+            // Show/hide card details
+            if (type === 'card') {
+                document.getElementById('cardDetails').style.display = 'block';
+            } else {
+                document.getElementById('cardDetails').style.display = 'none';
+            }
+        }
+
+        function updateTotal() {
+            const subtotal = 909.96;
+            let shipping = 0;
+
+            if (selectedDelivery === 'express') shipping = 18.00;
+            if (selectedDelivery === 'overnight') shipping = 50.00;
+
+            const total = subtotal + shipping;
+            document.getElementById('totalAmount').textContent = 'RM ' + total.toFixed(2);
+        }
+
+        function placeOrder() {
+            // Validate form
+            const inputs = document.querySelectorAll('.form-control[required]');
+            let valid = true;
+
+            inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    valid = false;
+                    input.style.borderColor = '#ef4444';
+                }
+            });
+
+            // Validate branch selection
+            const branchSelected = document.querySelector('input[name="branch"]:checked');
+            if (!branchSelected) {
+                valid = false;
+                alert('Please select which branch recommended this website');
+                return;
+            }
+
+            if (!valid) {
+                alert('Please fill all required fields');
+                return;
+            }
+
+            // Process order
+            alert('Order placed successfully! Redirecting to confirmation...');
+            window.location.href = 'confirmation.html';
+        }
+
+        // Toggle Menu Functionality
+        const toggleMenu = document.getElementById('toggleMenu');
+        const sideMenu = document.getElementById('sideMenu');
+        const menuOverlay = document.getElementById('menuOverlay');
+
+        if (toggleMenu) {
+            // Toggle menu open/close
+            toggleMenu.addEventListener('click', () => {
+                toggleMenu.classList.toggle('active');
+                sideMenu.classList.toggle('active');
+                menuOverlay.classList.toggle('active');
+            });
+
+            // Close menu when clicking overlay
+            menuOverlay.addEventListener('click', () => {
+                toggleMenu.classList.remove('active');
+                sideMenu.classList.remove('active');
+                menuOverlay.classList.remove('active');
+            });
+
+            // Close menu when clicking a link
+            const sideMenuLinks = sideMenu.querySelectorAll('a');
+            sideMenuLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    toggleMenu.classList.remove('active');
+                    sideMenu.classList.remove('active');
+                    menuOverlay.classList.remove('active');
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

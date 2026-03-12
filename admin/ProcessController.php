@@ -570,6 +570,15 @@ if(isset($_POST['ordercode'],$_POST['action'])){
 				}
 			}
 			
+			if($row['delivery_method'] == "foreign")
+			{
+				$delivery_fee = 18;
+				if($row['shipping_address']!="")
+				{
+					$shipping_address = $row['shipping_address'];
+				}
+			}
+			
 			if($row['delivery_method'] == "selfCollect")
 			{
 				$PickUpDesc = $row['collecting_point'];
@@ -597,7 +606,7 @@ if(isset($_POST['ordercode'],$_POST['action'])){
 				"name" => $row['name'],
 				"order_date" => date("M d, Y \a\t h:i A", strtotime($row['payment_date'])),
 				"subtotal"    => number_format((float)$row['subtotal'], 2, '.', ''),
-				"delivery_method" => ($row['delivery_method'] == "selfCollect") ? "Self Collect" : "Standard",
+				"delivery_method" => $row['delivery_method'],
 				"delivery_fee" => $delivery_fee,
 				"PickUpDesc" => $PickUpDesc,
 				"billing_address" => $billing_address,

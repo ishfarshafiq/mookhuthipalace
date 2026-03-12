@@ -240,6 +240,13 @@ if(isset($_SESSION['customer_code']))
 						$result = mysqli_query($conn,$sql);
 						while($row = mysqli_fetch_assoc($result)) {
 							$delivery_fee = 0;
+							
+							$delivery_method_desc = [
+								"selfCollect" => "Self Collect",
+								"standard" => "Standard",
+								"foreign" => "Singapore"
+							];
+							
 							$order_total = $row['order_total'];
 							$total_items = $row['total_items'];
 							$payment_date = $row['payment_date'];
@@ -260,10 +267,13 @@ if(isset($_SESSION['customer_code']))
 								$is_delivered = "<div class='purchase-status status-processing'><i class='fas fa-shipping-fast me-1'></i>Processing</div>";
 							}
 							
-							if($row['delivery_method'] == "standard")
-							{
-								$delivery_fee = 8;
-							}
+							$fees = [
+								"standard" => 8,
+								"foreign" => 18
+							];
+							
+							$delivery_fee = $fees[$row['delivery_method']] ?? 0;
+							
 							
 					?>
 
@@ -276,7 +286,7 @@ if(isset($_SESSION['customer_code']))
 								<div><strong>Date:</strong> <?php echo date("F ,d  Y", strtotime($payment_date))?></div>
 								<div><strong>Amount:</strong> RM <?php echo number_format((float)$order_total + $delivery_fee, 2, '.', '');?></div>
 								<div><strong>Items:</strong> <?php echo $total_items;?> Products</div>
-								<div><strong>Delivery Method:</strong> <?php echo $row['delivery_method'];?></div>
+								<div><strong>Delivery Method:</strong> <?php echo $delivery_method_desc[$row['delivery_method']];?></div>
 							</div>
 							<button class="btn-view-order" onclick="viewOrders('<?php echo $row['ordercode']; ?>')">
 										<i class="fas fa-eye me-1"></i>View Order
@@ -747,8 +757,28 @@ if(isset($_SESSION['customer_code']))
                             <div class="col-md-6 mb-3">
                                 <label for="shipping_state" class="form-label"
                                     style="color: var(--mp-muted); font-weight: 600;">State</label>
-                                <input type="text" class="form-control" id="shipping_state" name="shipping_state" value="" style="background: rgba(212, 175, 55, 0.05); border: 0.5px solid rgba(212, 175, 55, 0.25); color: var(--mp-text); border-radius: 6px; padding: 0.75rem;">
-                            </div>
+									<!--<input type="text" class="form-control" id="shipping_state" name="shipping_state" value="" style="background: rgba(212, 175, 55, 0.05); border: 0.5px solid rgba(212, 175, 55, 0.25); color: var(--mp-text); border-radius: 6px; padding: 0.75rem;">-->
+								<select class="form-control" id="shipping_state" name="shipping_state">
+									<option value="Johor">Johor</option>
+									<option value="Kedah">Kedah</option>
+									<option value="Kelantan">Kelantan</option>
+									<option value="Melaka">Melaka</option>
+									<option value="Negeri Sembilan">Negeri Sembilan</option>
+									<option value="Pahang">Pahang</option>
+									<option value="Perak">Perak</option>
+									<option value="Perlis">Perlis</option>
+									<option value="Pulau Pinang">Pulau Pinang</option>
+									<option value="Sabah">Sabah</option>
+									<option value="Sarawak">Sarawak</option>
+									<option value="Selangor">Selangor</option>
+									<option value="Terengganu">Terengganu</option>
+									<option value="Kuala Lumpur">Kuala Lumpur (FT)</option>
+									<option value="Putrajaya">Putrajaya (FT)</option>
+									<option value="Labuan">Labuan (FT)</option>
+									<option value="Singapore">Singapore</option>
+								</select>
+							
+							</div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -764,6 +794,14 @@ if(isset($_SESSION['customer_code']))
                             <label for="shipping_phone" class="form-label" style="color: var(--mp-muted); font-weight: 600;">Phone Number</label>
                             <input type="tel" class="form-control" id="shipping_phone" name="shipping_phone" value="" style="background: rgba(212, 175, 55, 0.05); border: 0.5px solid rgba(212, 175, 55, 0.25); color: var(--mp-text); border-radius: 6px; padding: 0.75rem;">
                         </div>
+						
+						<div class="mb-3 form-check">
+							<input type="checkbox" class="form-check-input" id="is_active" name="is_active" value="1">
+							<label for="is_active" class="form-check-label" style="color: var(--mp-muted); font-weight: 600;">
+								Set Default
+							</label>
+						</div>
+						
                     </form>
                 </div>
                 <div class="modal-footer" style="border-top: 0.5px solid rgba(212, 175, 55, 0.15); padding: 1.5rem;">

@@ -77,11 +77,13 @@ if(isset($_GET['ordercode']))
 	$result_delivery_method=mysqli_query($conn,"select delivery_method from checkout where order_code = '$ordercode'");
 	$row_delivery_method = mysqli_fetch_assoc($result_delivery_method);
 	$delivery_method = $row_delivery_method['delivery_method'];
-	if($delivery_method == "standard")
-	{
-		$delivery_fee = 8;
-	}
 	
+	$fees = [
+		"standard" => 8,
+		"foreign" => 18
+	];
+	
+	$delivery_fee = $fees[$delivery_method] ?? 0;
 	
 	
 	//Get Self Collect
@@ -248,7 +250,7 @@ else
                             <div class="info-icon"><i class="fas fa-shipping-fast"></i></div>
                             <div class="info-content">
                                 <h4>Shipping Method</h4>
-								<?php if($delivery_method == "standard") {?>	
+								<?php if($delivery_method == "standard" || $delivery_method == "foreign") {?>	
 									<p>Standard Delivery (3-5 business days)</p>
 								<?php } else {?>
 									<p>Self Collect</p>
@@ -259,7 +261,7 @@ else
                         <div class="info-item">
                             <div class="info-icon"><i class="fas fa-calendar"></i></div>
                             <div class="info-content">
-							<?php if($delivery_method == "standard") {?>
+							<?php if($delivery_method == "standard" || $delivery_method == "foreign") {?>
                                 <h4>Expected Delivery</h4>
                                 <p><?php echo $estimated_delivery_date;?></p>
 							<?php } else {?>

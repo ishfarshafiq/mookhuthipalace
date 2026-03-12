@@ -31,7 +31,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
 		$collect_branch    = $_POST['collectBranch'] ?? '';
 	}
 	
-	if($delivery_method == "standard")
+	if($delivery_method == "standard" || $delivery_method == "foreign")
 	{
 		if($isShippingDifferent)
 		{
@@ -56,8 +56,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
 				}
 				else
 				{
-					if($shipping_address_line1 != "" && $shipping_city != "")
-					{
+					//if($shipping_address_line1 != "" && $shipping_city != "")
+					//{
 						
 						$insert_shipping="insert into shipping_address(customer_code, name, email, phone, address_line1, address_line2, city, state, postcode, country) values 
 							('$customer_code', '$shipping_name', '$shipping_email', '$shipping_phone', '$shipping_address_line1', '$shipping_address_line2', '$shipping_city', '$shipping_state', '$shipping_postcode', '$shipping_country')";
@@ -65,7 +65,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
 							$shipping_addressID = mysqli_insert_id($conn);
 						}
 						
-					}
+					//}
 						
 				}
 				

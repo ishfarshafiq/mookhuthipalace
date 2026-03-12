@@ -65,6 +65,30 @@ if(isset($_POST['ordercode']))
 				
 				
 			}
+			else if($delivery_method == "foreign")
+			{
+				
+				$delivery_fee = 18;
+				if($row['shipping_addressID'] > 0)
+				{
+					
+					$shipping_address = $row['sa_address_line1'].",".$row['sa_address_line2'].", <br>".$row['sa_postcode']." ".$row['sa_city'].", <br>".$row['sa_state'].", <br>Malaysia";
+					
+					$billing_address = [
+							"address"    => $shipping_address
+						];
+					
+					
+				}
+				else
+				{
+					$billing_address = [
+							"address"    => $row['address'].",  <br>".$row['postcode']." ".$row['city'].",  <br>".$row['state'].",  <br> Malaysia"
+						];
+					
+				}
+				
+			}
 			else
 			{
 				//selfcollect
@@ -91,7 +115,7 @@ if(isset($_POST['ordercode']))
 	  echo json_encode([
         "status" => "success",
         "ordercode" => $ordercode,
-        "delivery_method" => ($delivery_method == "standard") ? "Delivery" : "Self Collect",
+        "delivery_method" => $delivery_method,
 		"delivery_fee" => $delivery_fee,
         "payment_method" => $payment_method,
         "payment_date" => $payment_date,

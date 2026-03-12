@@ -132,6 +132,16 @@ if(!empty($userID)) {
                             </div>
                             <div class="option-price">RM 8.00</div>
                         </div>
+						
+						<div class="option-card" onclick="selectDelivery(this, 'foreign')">
+                            <div class="option-radio"></div>
+                            <div class="option-content" style="flex: 1;">
+                                <h4><i class="fas fa-bolt"></i> Singapore Delivery</h4>
+                                <p>Delivery in 1-4 business days</p>
+                            </div>
+                            <div class="option-price">RM18.00</div>
+                        </div>
+						
                     </div>
 					
 					<input type="hidden" name="delivery_method" id="delivery_method" value="selfCollect">
@@ -247,7 +257,6 @@ if(!empty($userID)) {
                             <label class="form-label">Country *</label>
                             <select class="form-control" id="billing_country" name="billing_country">
                                 <option value="MY">Malaysia</option>
-
                             </select>
                         </div>
                     </div>
@@ -349,6 +358,7 @@ if(!empty($userID)) {
                                 <option value="Kuala Lumpur">Kuala Lumpur (FT)</option>
                                 <option value="Putrajaya">Putrajaya (FT)</option>
                                 <option value="Labuan">Labuan (FT)</option>
+								<option value="Singapore">Singapore</option>
                             </select>
                         </div>
                         
@@ -374,6 +384,7 @@ if(!empty($userID)) {
                             <select class="form-control shipping-input" id="shipping_country" name="shipping_country">
                                 <option value="">Select Country</option>
                                 <option value="MY">Malaysia</option>
+								<option value="SG">Singapore</option>
                             </select>
                         </div>
                     </div>
@@ -586,11 +597,17 @@ if(!empty($userID)) {
             if (type === 'express') cost = 'RM 25.00';
             if (type === 'overnight') cost = 'RM 50.00';
 			if (type === 'standard') cost = 'RM 8.00';
+			if (type === 'foreign') cost = 'RM 18.00';
 			
 			if(type === 'standard')
 			{
 				let subtotal = document.getElementById("subtotal").dataset.value;
 				let total = (parseFloat(subtotal) + 8.00).toFixed(2);
+				document.getElementById('totalAmount').textContent = "RM "+ total
+			}
+			else if(type === 'foreign'){
+				let subtotal = document.getElementById("subtotal").dataset.value;
+				let total = (parseFloat(subtotal) + 18.00).toFixed(2);
 				document.getElementById('totalAmount').textContent = "RM "+ total
 			}
 			else

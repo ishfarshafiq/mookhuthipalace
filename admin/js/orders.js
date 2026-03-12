@@ -17,19 +17,25 @@ function loadOrderDetailByOrderCode(ordercode)
 				let subtotal = parseFloat(response.data.subtotal);
 				let delivery_fee = parseFloat(response.data.delivery_fee);
 				
+				const deliveryTypes = {
+						standard: "Standard",
+						foreign: "Singapore",
+						selfCollect: "Self Collect"
+					};
+				
 				document.getElementById('viewOrderId').textContent = response.data.ordercode;
 				document.getElementById('viewCustomer').textContent = response.data.name;
 				document.getElementById('viewDate').textContent = response.data.order_date;
 				document.getElementById('viewAmount').textContent = "RM " + (subtotal + delivery_fee).toFixed(2);
-				document.getElementById('viewDeliveryType').textContent = response.data.delivery_method;
+				document.getElementById('viewDeliveryType').textContent = deliveryTypes[response.data.delivery_method];
 				document.getElementById('viewBillingAddress').textContent = response.data.billing_address;
 				
-				if(response.data.delivery_method == "Self Collect")
+				if(response.data.delivery_method == "selfCollect")
 				{
 					document.getElementById('viewPickUpDesc').textContent = response.data.PickUpDesc;
 				}
 				
-				if(response.data.delivery_method == "Standard")
+				if(response.data.delivery_method == "standard" || response.data.delivery_method == "foreign")
 				{
 					document.getElementById('viewShippingAddress').textContent = response.data.shipping_address;
 				}

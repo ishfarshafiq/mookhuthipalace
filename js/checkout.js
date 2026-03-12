@@ -77,7 +77,7 @@ $("#checkoutForm").on("submit", function (e) {
 		
 	}
 	
-	if(data.delivery_method === "standard")
+	if(data.delivery_method === "standard" || data.delivery_method === "foreign")
 	{
 		
 		let isShippingDifferent = $("#shippingToggle").is(":checked");

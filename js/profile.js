@@ -356,7 +356,12 @@ function viewOrders(ordercode){
                 $("#modalStatusDate").text("Payment Date: " + response.payment_date);
 
                 // Delivery Info
-				$("#modalDeliveryType").text(response.delivery_method);
+				const deliveryTypes = {
+						standard: "Standard",
+						foreign: "Singapore",
+						selfCollect: "Self Collect"
+					};
+				$("#modalDeliveryType").text(deliveryTypes[response.delivery_method] || "Unknown");
 				
                 $("#modalDeliveryAddress").html(response.billing_address.address);
 
@@ -555,6 +560,7 @@ function openShippingEditAddress(shipping_addressID){
 				document.getElementById('shipping_city').value = response.data.city;
 				document.getElementById('shipping_state').value = response.data.state;
 				document.getElementById('shipping_postcode').value = response.data.postcode;
+				document.getElementById('is_active').checked = response.data.is_active == 1;
 			 }
 		 
 				
@@ -575,6 +581,7 @@ function saveShippingAddress()
 	const shipping_city = $('#shipping_city').val();
 	const shipping_state = $('#shipping_state').val();
 	const shipping_postcode = $('#shipping_postcode').val();
+	var is_active = $("#is_active").is(":checked") ? 1 : 0;
 	
 	$.ajax({
             url: 'AccountController.php',
@@ -588,7 +595,8 @@ function saveShippingAddress()
 				shipping_address2: shipping_address2,
 				shipping_city: shipping_city,
 				shipping_state: shipping_state,
-				shipping_postcode: shipping_postcode
+				shipping_postcode: shipping_postcode,
+				is_active: is_active
             },
             success: function (response) {
                

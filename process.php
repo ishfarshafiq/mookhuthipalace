@@ -13,10 +13,13 @@ if(isset($_GET['userID'], $_GET['order_code'])) {
 	
 	$result_delivery_method = mysqli_query($conn,"SELECT delivery_method FROM checkout where order_code = '$order_code' limit 1");
 	$row_delivery_method = mysqli_fetch_assoc($result_delivery_method);
-	if($row_delivery_method['delivery_method'] == "standard")
-	{
-		$delivery_fee = 8;
-	}
+	
+	$fees = [
+		"standard" => 8,
+		"foreign" => 18
+	];
+
+	$delivery_fee = $fees[$row_delivery_method['delivery_method']] ?? 0;
 	
 	$get_payment_method = "SELECT payment_method FROM checkout where order_code = '$order_code' limit 1";
 	$result_payment_method = mysqli_query($conn,$get_payment_method);

@@ -195,14 +195,28 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
 					$result = mysqli_query($conn, $sql);
 					while($row = mysqli_fetch_assoc($result)) {
 						
+						$delivery_method_desc = [
+								"selfCollect" => "Self Collect",
+								"standard" => "Standard",
+								"foreign" => "Singapore"
+							];
+						
 						
 						$status = $row['is_delivered'];
 						$class = $statusClasses[$status] ?? "secondary";
 						
 						$delivery_fee = 0;
-						if($row['delivery_method'] == "standard"){
-							$delivery_fee = 8;
-						}
+						
+						$fees = [
+							"standard" => 8,
+							"foreign" => 18
+						];
+						
+						$delivery_fee = $fees[$row['delivery_method']] ?? 0;
+						
+						// if($row['delivery_method'] == "standard"){
+							// $delivery_fee = 8;
+						// }
 
 						
 						$productSql = "SELECT d.product_name, b.style, b.color, b.quantity FROM orders b
@@ -250,7 +264,7 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
 					</div>
                     <div class="detail-item">
                         <div class="detail-label">Delivery Method</div>
-                        <div class="detail-value"><?php echo ($row['delivery_method'] == "selfCollect") ? "Self Collect" : "Delivery"?></div>
+                        <div class="detail-value"><?php echo $delivery_method_desc[$row['delivery_method']];?></div>
                     </div>
                 </div>
                 <div class="action-buttons">

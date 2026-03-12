@@ -75,9 +75,9 @@ if(isset($_GET['billcode'],$_GET['order_id'],$_GET['status_id'])){
 		echo "<script>
 			 swal('Success!', 'Payment is successfull.', 'success').then(okay => {
 		   if (okay) {
-					window.location.href ='http://localhost/mookuthipalace/confirmation.php?ordercode=$ordercode';
+					window.location.href ='http://localhost/mookhuthipalace/confirmation.php?ordercode=$ordercode';
 				}else{
-					window.location.href ='http://localhost/mookuthipalace/profile.php';
+					window.location.href ='http://localhost/mookhuthipalace/profile.php';
 				}
 			});
 		 </script>";
@@ -102,9 +102,9 @@ if(isset($_GET['billcode'],$_GET['order_id'],$_GET['status_id'])){
 		echo "<script>
 			swal('Pending!', 'Payment is panding. Kindly wait for our administrator contact you. Thank you.', 'info').then(okay => {
 		   if (okay) {
-					window.location.href ='http://localhost/mookuthipalace/profile.php';
+					window.location.href ='http://localhost/mookhuthipalace/profile.php';
 				}else{
-					window.location.href ='http://localhost/mookuthipalace/profile.php';
+					window.location.href ='http://localhost/mookhuthipalace/profile.php';
 				}
 			});
 		 </script>";  
@@ -128,9 +128,9 @@ if(isset($_GET['billcode'],$_GET['order_id'],$_GET['status_id'])){
 		 echo "<script>
 			swal('Fail!', 'Trasaction fail.', 'warning').then(okay => {
 		   if (okay) {
-					window.location.href ='http://localhost/mookuthipalace/profile.php';
+					window.location.href ='http://localhost/mookhuthipalace/profile.php';
 				}else{
-					window.location.href ='http://localhost/mookuthipalace/profile.php';
+					window.location.href ='http://localhost/mookhuthipalace/profile.php';
 				}
 			});
 		 </script>";  
@@ -139,7 +139,7 @@ if(isset($_GET['billcode'],$_GET['order_id'],$_GET['status_id'])){
 	}else{
 		
 		//echo "<script>location.href='https://mookhuthipalace.com/demo/profile.php'</script>";
-		echo "<script>location.href='http://localhost/mookuthipalace/profile.php'</script>";
+		echo "<script>location.href='http://localhost/mookhuthipalace/profile.php'</script>";
 	}  
 	
 

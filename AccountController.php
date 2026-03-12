@@ -307,7 +307,8 @@ if (isset($_POST['shipping_addressID'])) {
 		"address_line2" => $row['address_line2'],
 		"city" => $row['city'],
 		"state" => $row['state'],
-		"postcode" => $row['postcode']
+		"postcode" => $row['postcode'],
+		"is_active" => $row['is_active']
 	];
 		
 	
@@ -319,7 +320,7 @@ if (isset($_POST['shipping_addressID'])) {
     
 }
 
-if (isset($_POST['shipping_addressIDs'],$_POST['shipping_name'],$_POST['shipping_phone'],$_POST['shipping_address1'],$_POST['shipping_address2'],$_POST['shipping_city'],$_POST['shipping_state'],$_POST['shipping_postcode'])) {
+if (isset($_POST['shipping_addressIDs'],$_POST['shipping_name'],$_POST['shipping_phone'],$_POST['shipping_address1'],$_POST['shipping_address2'],$_POST['shipping_city'],$_POST['shipping_state'],$_POST['shipping_postcode'],$_POST['is_active'])) {
 
     $shipping_addressID = (int)$_POST['shipping_addressIDs'];
 	$shipping_name = mysqli_real_escape_string($conn, $_POST['shipping_name']);
@@ -329,16 +330,25 @@ if (isset($_POST['shipping_addressIDs'],$_POST['shipping_name'],$_POST['shipping
 	$shipping_city = mysqli_real_escape_string($conn, $_POST['shipping_city']);
 	$shipping_state = mysqli_real_escape_string($conn, $_POST['shipping_state']);
 	$shipping_postcode = mysqli_real_escape_string($conn, $_POST['shipping_postcode']);
+	$is_active = mysqli_real_escape_string($conn, $_POST['is_active']);
 	
-	mysqli_query($conn, "update shipping_address
+	if(mysqli_query($conn, "update shipping_address set is_active = '0' WHERE name = '$shipping_name' and phone = '$shipping_phone'"))
+	{
+		
+		mysqli_query($conn, "update shipping_address
 								set name = '$shipping_name',
 								phone = '$shipping_phone',
 								address_line1 = '$shipping_address1',
 								address_line2 = '$shipping_address2',
 								city = '$shipping_city',
 								state = '$shipping_state',
-								postcode = '$shipping_postcode'
+								postcode = '$shipping_postcode',
+								is_active = '$is_active'
 								WHERE shipping_addressID = $shipping_addressID");
+		
+	}
+	
+	
 	
 	echo json_encode([
 		"status" => "success"
@@ -465,8 +475,7 @@ if(isset($_POST['userID'],$_POST['active_shipping_addressID'])) {
     $query = mysqli_query($conn, "
         SELECT b.* 
         FROM customer a 
-        INNER JOIN shipping_address b 
-            ON a.customer_code = b.customer_code
+        INNER JOIN shipping_address b ON a.customer_code = b.customer_code
         WHERE a.userID = $userID 
         AND b.is_active = '1'
         LIMIT 1
