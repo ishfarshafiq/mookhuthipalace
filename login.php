@@ -19,6 +19,14 @@ if(isset($_SESSION['userID']))
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="css/style_login.css" rel="stylesheet" type="text/css" />
+
+<style>
+.social-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+</style>
 </head>
 
 <body>
@@ -107,12 +115,17 @@ if(isset($_SESSION['userID']))
 
             <!-- Social Login -->
             <div class="social-login">
-                <button class="btn-social" onclick="facebookLogin()">
+                <!--<button class="btn-social" onclick="facebookLogin()">
                     <i class="fab fa-facebook-f"></i> Facebook
                 </button>
-                <button class="btn-social" onclick="googleLoginRegister()">
+				<button class="btn-social" onclick="googleLoginRegister()">
                     <i class="fab fa-google"></i> Google
-                </button>
+                </button>-->
+				<div class="social-login">
+					<button type="button" class="btn-social" onclick="googleLoginRegister()">
+						<i class="fab fa-google"></i> Google
+					</button>
+				</div>
             </div>
 
             <!-- Sign Up Link -->

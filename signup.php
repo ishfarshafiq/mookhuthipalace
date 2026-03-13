@@ -11,7 +11,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="css/style_signup.css" rel="stylesheet" type="text/css" />
 	<style>
-	
+	.social-signup {
+    display: flex;
+    justify-content: center;
+}
 	</style>
 </head>
 
@@ -115,12 +118,15 @@
 
             <!-- Social Sign Up -->
             <div class="social-signup">
-                <button type="button" class="btn-social" onclick="facebookRegister()">
+                <!--<button type="button" class="btn-social" onclick="facebookRegister()">
 					<i class="fab fa-facebook-f"></i> Facebook
 				</button>
                 <button type="button" class="btn-social" onclick="googleLoginRegister()">
                     <i class="fab fa-google"></i> Google
-                </button>
+                </button>-->
+				  <button type="button" class="btn-social" onclick="googleLoginRegister()">
+					<i class="fab fa-google"></i> Google
+				</button>
             </div>
 
             <!-- Login Link -->
