@@ -782,7 +782,57 @@ function updateActiveShippingAddress(radio, addressID) {
     });
 }
 
+//Google
+function googleLoginRegister() {
 
+    google.accounts.id.initialize({
+        client_id: "40236553918-nbo9gpodc0t3aie8rt8amragjgrkmk1k.apps.googleusercontent.com",
+        callback: handleGoogleResponse
+    });
+
+    google.accounts.id.prompt();
+}
+
+function handleGoogleResponse(response) {
+
+    const data = parseJwt(response.credential);
+
+    fetch("google-register.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            id: data.sub,
+            name: data.name,
+            email: data.email
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.status === "success") {
+            window.location.href = "profile.php";
+        } else {
+            alert("Failed Authentication.");
+        }
+
+    });
+}
+
+function parseJwt(token) {
+
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+
+    var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
+//FB
 function facebookRegister() {
 
     FB.login(function(response) {

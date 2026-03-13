@@ -110,7 +110,7 @@ if(isset($_SESSION['userID']))
                 <button class="btn-social" onclick="facebookLogin()">
                     <i class="fab fa-facebook-f"></i> Facebook
                 </button>
-                <button class="btn-social" onclick="alert('Google login coming soon!')">
+                <button class="btn-social" onclick="googleLoginRegister()">
                     <i class="fab fa-google"></i> Google
                 </button>
             </div>
@@ -175,6 +175,8 @@ if(isset($_SESSION['userID']))
 
     <!-- Footer -->
    <?php include_once('includes/footer.php'); ?>
+   
+   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 	

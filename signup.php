@@ -118,7 +118,7 @@
                 <button type="button" class="btn-social" onclick="facebookRegister()">
 					<i class="fab fa-facebook-f"></i> Facebook
 				</button>
-                <button type="button" class="btn-social" onclick="alert('Google signup coming soon!')">
+                <button type="button" class="btn-social" onclick="googleLoginRegister()">
                     <i class="fab fa-google"></i> Google
                 </button>
             </div>
@@ -155,6 +155,8 @@
             </div>
         </div>
     </footer>
+	
+	<script src="https://accounts.google.com/gsi/client" async defer></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     
