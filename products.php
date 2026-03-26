@@ -85,6 +85,7 @@ if(isset($_SESSION['userID']))
     </div>
 	
 	<?php
+	
 	$search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 	$minPrice = isset($_GET['minPrices']) ? floatval($_GET['minPrices']) : 1;
 	$maxPrice = isset($_GET['maxPrices']) ? floatval($_GET['maxPrices']) : 10000;
@@ -155,6 +156,10 @@ if(isset($_SESSION['userID']))
 
     <!-- Main Content -->
     <div class="container" style="padding-left: 15px; padding-right: 15px; padding-bottom: 5rem;">
+	<input type="hidden" id="userID" name="userID" value="<?php echo $userID;?>" />
+	<input type="hidden" id="customer_code" name="customer_code" value="<?php echo $customer_code;?>" />
+	
+	<form method="GET" id="filterForm" action="products.php">
         <!-- Search Box -->
         <div class="search-filter-box">
             <div class="search-box">
@@ -165,8 +170,7 @@ if(isset($_SESSION['userID']))
         </div>
 
         <div class="row">
-			<input type="hidden" id="userID" name="userID" value="<?php echo $userID;?>" />
-			<input type="hidden" id="customer_code" name="customer_code" value="<?php echo $customer_code;?>" />
+			
             <!-- Filter Sidebar -->
            
 			<div class="col-lg-3">
@@ -174,7 +178,7 @@ if(isset($_SESSION['userID']))
                     <h3 class="filter-title">
                         <i class="fas fa-filter"></i> Filters
                     </h3>
-			<form method="GET" id="filterForm" action="products.php">
+			
                     <!-- Price Range -->
                     <div class="filter-group">
                         <h6>Price Range</h6>
@@ -217,7 +221,7 @@ if(isset($_SESSION['userID']))
                         </div>
 						<?php } ?>
                     </div>
-
+						<button type="submit" name="btnFilter" class="btn-reset">Apply Filters</button>
 						<button type="button" class="btn-reset" onclick="resetFilters()">Reset Filters</button>
 					</form>
                 </div>
