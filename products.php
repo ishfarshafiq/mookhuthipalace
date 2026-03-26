@@ -85,6 +85,51 @@ if(isset($_SESSION['userID']))
     </div>
 	
 	<?php
+	$search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
+	$minPrice = isset($_GET['minPrices']) ? floatval($_GET['minPrices']) : 1;
+	$maxPrice = isset($_GET['maxPrices']) ? floatval($_GET['maxPrices']) : 10000;
+	
+	// Swap if min > max
+	if ($minPrice > $maxPrice) {
+		$tmp = $minPrice;
+		$minPrice = $maxPrice;
+		$maxPrice = $tmp;
+	}
+
+	$categories = $_GET['category'] ?? [];
+	$materials = $_GET['material'] ?? [];
+	
+
+	$where = "WHERE a.status = 'ACTIVE' AND a.is_delete = '0'";
+
+	if (!empty($search)) {
+		$where .= " AND (
+			a.product_name LIKE '%$search%' OR
+			a.description LIKE '%$search%' OR
+			b.category LIKE '%$search%' OR
+			c.material LIKE '%$search%'
+		)";
+	}
+	
+	// Price
+	$where .= " AND ((a.price >= $minPrice AND a.price <= $maxPrice) 
+                OR (a.original_price >= $minPrice AND a.original_price <= $maxPrice))";
+	
+	
+	// Category
+	if (!empty($categories)) {
+		$catList = "'" . implode("','", $categories) . "'";
+		$where .= " AND b.category IN ($catList)";
+	}
+
+	// Material
+	if (!empty($materials)) {
+		$matList = "'" . implode("','", $materials) . "'";
+		$where .= " AND c.material IN ($matList)";
+	}
+	?>
+	
+	<?php
 	$limit = 12; // products per page
 
 	$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -95,10 +140,11 @@ if(isset($_SESSION['userID']))
 
 	$start = ($page - 1) * $limit;
 	
-	$count_sql = "SELECT COUNT(*) as total 
-              FROM product a
-              WHERE a.status = 'ACTIVE' 
-              AND a.is_delete = '0'";
+  $count_sql = "SELECT COUNT(*) as total 
+				  FROM product a
+				  INNER JOIN category b ON a.categoryID = b.categoryID
+				  INNER JOIN material c ON a.materialID = c.materialID
+				  $where";
 
 	$count_result = mysqli_query($conn, $count_sql);
 	$count_row = mysqli_fetch_assoc($count_result);
@@ -113,7 +159,8 @@ if(isset($_SESSION['userID']))
         <div class="search-filter-box">
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Search products...">
+                <!--<input type="text" id="searchInput" placeholder="Search products...">-->
+				<input type="text" id="searchInput" name="search" value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>" placeholder="Search products...">
             </div>
         </div>
 
@@ -121,19 +168,20 @@ if(isset($_SESSION['userID']))
 			<input type="hidden" id="userID" name="userID" value="<?php echo $userID;?>" />
 			<input type="hidden" id="customer_code" name="customer_code" value="<?php echo $customer_code;?>" />
             <!-- Filter Sidebar -->
-            <div class="col-lg-3">
+           
+			<div class="col-lg-3">
                 <div class="filter-sidebar">
                     <h3 class="filter-title">
                         <i class="fas fa-filter"></i> Filters
                     </h3>
-
+			<form method="GET" id="filterForm" action="products.php">
                     <!-- Price Range -->
                     <div class="filter-group">
                         <h6>Price Range</h6>
                         <div class="price-range">
-                            <input type="number" id="minPrice" placeholder="Min" value="1">
+                            <input type="number" id="minPrices" name="minPrices" placeholder="Min" value="<?php echo isset($_GET['minPrices']) ? $_GET['minPrices'] : 1; ?>">
                             <span>-</span>
-                            <input type="number" id="maxPrice" placeholder="Max" value="10000">
+                            <input type="number" id="maxPrices" name="maxPrices" placeholder="Max" value="<?php echo isset($_GET['maxPrices']) ? $_GET['maxPrices'] : 10000; ?>">
                         </div>
                     </div>
 
@@ -147,7 +195,7 @@ if(isset($_SESSION['userID']))
 						?> 
 						
 						<div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="<?= htmlspecialchars($row['category']); ?>" name="category" value="<?= htmlspecialchars($row['category']); ?>">
+							<input class="form-check-input" type="checkbox" name="category[]" value="<?= htmlspecialchars($row['category']); ?>" <?php if(in_array($row['category'], $categories)) echo 'checked'; ?>>
                             <label class="form-check-label" for="<?= htmlspecialchars($row['category']); ?>"><?= htmlspecialchars($row['category']); ?></label>
                         </div>
 						
@@ -164,15 +212,17 @@ if(isset($_SESSION['userID']))
 						while($row = mysqli_fetch_assoc($result)) {
 						?>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="<?= htmlspecialchars($row['material']); ?>" name="material" value="<?= htmlspecialchars($row['material']); ?>">
-                            <label class="form-check-label" for="<?= htmlspecialchars($row['material']); ?>"><?= htmlspecialchars($row['material']); ?></label>
+                            <input class="form-check-input" type="checkbox" name="material[]" value="<?= htmlspecialchars($row['material']); ?>" <?php if(in_array($row['material'], $materials)) echo 'checked'; ?>>
+							<label class="form-check-label" for="<?= htmlspecialchars($row['material']); ?>"><?= htmlspecialchars($row['material']); ?></label>
                         </div>
 						<?php } ?>
                     </div>
 
-                    <button class="btn-reset" onclick="resetFilters()">Reset Filters</button>
+						<button type="button" class="btn-reset" onclick="resetFilters()">Reset Filters</button>
+					</form>
                 </div>
             </div>
+			
 
             <!-- Products Section -->
             <div class="col-lg-9">
@@ -190,20 +240,16 @@ if(isset($_SESSION['userID']))
                 <div class="row g-4" id="productsContainer">
 				
 				   <?php
-					// $sql = "SELECT a.productID, a.product_name, a.description, a.sku, b.category, a.original_price, a.price, a.stock_quantity, c.material, a.status, a.product_image FROM product a
-					// inner join category b on a.categoryID = b.categoryID
-					// inner join material c on a.materialID = c.materialID
-					// WHERE a.status = 'ACTIVE' and a.is_delete = '0'";
-					
+				   
 					$sql = "SELECT a.productID, a.product_name, a.description, a.sku, 
-							b.category, a.original_price, a.price, 
-							a.stock_quantity, c.material, a.status, a.product_image 
-							FROM product a
-							INNER JOIN category b ON a.categoryID = b.categoryID
-							INNER JOIN material c ON a.materialID = c.materialID
-							WHERE a.status = 'ACTIVE' 
-							AND a.is_delete = '0'
-							LIMIT $start, $limit";
+								b.category, a.original_price, a.price, 
+								a.stock_quantity, c.material, a.status, a.product_image 
+								FROM product a
+								INNER JOIN category b ON a.categoryID = b.categoryID
+								INNER JOIN material c ON a.materialID = c.materialID
+								$where
+								LIMIT $start, $limit";
+		
 					$result = mysqli_query($conn,$sql);
 					
 					if(mysqli_num_rows($result) > 0)
@@ -275,7 +321,12 @@ if(isset($_SESSION['userID']))
                     
 				</div>
 				
-				
+				<?php
+				$params = $_GET;
+				unset($params['page']); // remove page
+
+				$queryString = http_build_query($params);
+				?>
 				<div class="d-flex justify-content-center mt-4">
 					<nav>
 						<ul class="pagination">
@@ -283,23 +334,21 @@ if(isset($_SESSION['userID']))
 							<!-- Previous Button -->
 							<?php if ($page > 1): ?>
 								<li class="page-item">
-									<a class="page-link" href="?page=<?php echo $page - 1; ?>">Previous</a>
+									<a class="page-link" href="?page=<?php echo $page - 1; ?>&<?php echo $queryString; ?>">Previous</a>
 								</li>
 							<?php endif; ?>
 
 							<!-- Page Numbers -->
 							<?php for ($i = 1; $i <= $total_pages; $i++): ?>
 								<li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
-									<a class="page-link" href="?page=<?php echo $i; ?>">
-										<?php echo $i; ?>
-									</a>
+									<a class="page-link" href="?page=<?php echo $i; ?>&<?php echo $queryString; ?>"><?php echo $i; ?></a>
 								</li>
 							<?php endfor; ?>
 
 							<!-- Next Button -->
 							<?php if ($page < $total_pages): ?>
 								<li class="page-item">
-									<a class="page-link" href="?page=<?php echo $page + 1; ?>">Next</a>
+									<a class="page-link" href="?page=<?php echo $page + 1; ?>&<?php echo $queryString; ?>">Next</a>
 								</li>
 							<?php endif; ?>
 
@@ -310,7 +359,8 @@ if(isset($_SESSION['userID']))
 				
             </div>
         </div>
-    </div>
+    
+	</div>
 
     <!-- Footer -->
     <footer>
@@ -337,7 +387,7 @@ if(isset($_SESSION['userID']))
             </div>
         </div>
     </footer>
-
+	
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     
 		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -345,6 +395,21 @@ if(isset($_SESSION['userID']))
 	  <script type="text/javascript" src="js/product.js"></script>
 	
 	<script>
+	
+	document.querySelectorAll('#filterForm input').forEach(el => {
+		el.addEventListener('change', () => {
+			document.getElementById('filterForm').submit();
+		});
+	});
+	
+	document.getElementById('searchInput').addEventListener('keyup', function(e) {
+		if (e.key === 'Enter') {
+			const search = this.value;
+			window.location.href = "?search=" + encodeURIComponent(search);
+		}
+	});
+	
+	
         // Toggle Menu Functionality
         const toggleMenu = document.getElementById('toggleMenu');
         const sideMenu = document.getElementById('sideMenu');
@@ -378,50 +443,50 @@ if(isset($_SESSION['userID']))
         const products = document.querySelectorAll('.product-card');
 
         function filterProducts() {
-            const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
-            const maxPrice = parseFloat(document.getElementById('maxPrice').value) || 999999;
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            // const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
+            // const maxPrice = parseFloat(document.getElementById('maxPrice').value) || 999999;
+            // const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
-            // Get selected categories
-            const selectedCategories = Array.from(document.querySelectorAll('input[name="category"]:checked'))
-					.map(cb => cb.value.toLowerCase());
+            // // Get selected categories
+            // const selectedCategories = Array.from(document.querySelectorAll('input[name="category"]:checked'))
+					// .map(cb => cb.value.toLowerCase());
 
-            // Get selected materials
-            const selectedMaterials = Array.from(document.querySelectorAll('input[name="material"]:checked'))
-					.map(cb => cb.value.toLowerCase());
+            // // Get selected materials
+            // const selectedMaterials = Array.from(document.querySelectorAll('input[name="material"]:checked'))
+					// .map(cb => cb.value.toLowerCase());
 
-            let visibleCount = 0;
-            products.forEach(product => {
-                const price = parseFloat(product.dataset.price);
-                const name = product.querySelector('.product-name').textContent.toLowerCase();
-                const desc = (product.querySelector('.product-desc')?.textContent || '').toLowerCase();
-                const category = (product.dataset.category || '').toLowerCase();
-                const material = (product.dataset.material || '').toLowerCase();
+            // let visibleCount = 0;
+            // products.forEach(product => {
+                // const price = parseFloat(product.dataset.price);
+                // const name = product.querySelector('.product-name').textContent.toLowerCase();
+                // const desc = (product.querySelector('.product-desc')?.textContent || '').toLowerCase();
+                // const category = (product.dataset.category || '').toLowerCase();
+                // const material = (product.dataset.material || '').toLowerCase();
 
-                // Check price range
-                const priceMatch = (price >= minPrice && price <= maxPrice);
+                // // Check price range
+                // const priceMatch = (price >= minPrice && price <= maxPrice);
 
-                // Check search term (name/description/category/material)
-                const searchMatch =
-                    searchTerm === '' ||
-                    name.includes(searchTerm) ||
-                    desc.includes(searchTerm) ||
-                    category.includes(searchTerm) ||
-                    material.includes(searchTerm);
+                // // Check search term (name/description/category/material)
+                // const searchMatch =
+                    // searchTerm === '' ||
+                    // name.includes(searchTerm) ||
+                    // desc.includes(searchTerm) ||
+                    // category.includes(searchTerm) ||
+                    // material.includes(searchTerm);
 
-                // Check category filter
-                const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(category);
+                // // Check category filter
+                // const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(category);
 
-                // Check material filter
-                const materialMatch = selectedMaterials.length === 0 || selectedMaterials.includes(material);
+                // // Check material filter
+                // const materialMatch = selectedMaterials.length === 0 || selectedMaterials.includes(material);
 
-                const show = priceMatch && searchMatch && categoryMatch && materialMatch;
+                // const show = priceMatch && searchMatch && categoryMatch && materialMatch;
 
-                product.parentElement.style.display = show ? '' : 'none';
-                if (show) visibleCount++;
-            });
+                // //product.parentElement.style.display = show ? '' : 'none';
+                // //if (show) visibleCount++;
+            // });
 
-            document.getElementById('resultCount').textContent = visibleCount;
+            // document.getElementById('resultCount').textContent = visibleCount;
         }
 
         function sortProducts() {
@@ -446,12 +511,8 @@ if(isset($_SESSION['userID']))
         }
 
         function resetFilters() {
-            document.getElementById('minPrice').value = '50';
-            document.getElementById('maxPrice').value = '10000';
-            document.getElementById('searchInput').value = '';
-            document.querySelectorAll('.form-check-input').forEach(cb => cb.checked = false);
-            document.getElementById('sortSelect').value = '';
-            filterProducts();
+			 window.location.href = window.location.origin + window.location.pathname;
+           
         }
 
         function addToCart(productName, price) {
@@ -459,7 +520,7 @@ if(isset($_SESSION['userID']))
             alert(`Added ${productName} (RM ${p.toFixed(2)}) to cart!`);
         }
 
-        document.getElementById('searchInput').addEventListener('keyup', filterProducts);
+        //document.getElementById('searchInput').addEventListener('keyup', filterProducts);
         document.getElementById('minPrice').addEventListener('change', filterProducts);
         document.getElementById('maxPrice').addEventListener('change', filterProducts);
         document.querySelectorAll('input[name="category"]').forEach(cb => cb.addEventListener('change', filterProducts));
@@ -469,6 +530,8 @@ if(isset($_SESSION['userID']))
         // Initialize result count on first load
         filterProducts();
     </script>
+
+
 </body>
 
 </html>
