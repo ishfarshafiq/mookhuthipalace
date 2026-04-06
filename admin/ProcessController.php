@@ -531,7 +531,7 @@ if(isset($_POST['ordercode'],$_POST['action'])){
 										// WHERE a.ordercode = '$ordercode'
 										// GROUP BY a.ordercode, ua.name, c.delivery_method, c.payment_method, a.payment_status, c.collecting_point, a.payment_date, a.is_delivered");
 
-		$query = mysqli_query($conn, "SELECT a.ordercode, ua.name, c.delivery_method, c.billing_addressID, c.shipping_addressID, c.payment_method, a.payment_status, c.collecting_point, a.payment_date, a.is_delivered, SUM(b.quantity * b.price) AS subtotal,
+		$query = mysqli_query($conn, "SELECT a.ordercode, ua.name, c.delivery_method, c.billing_addressID, c.shipping_addressID, c.payment_method, c.recommendedBranch, a.payment_status, c.collecting_point, a.payment_date, a.is_delivered, SUM(b.quantity * b.price) AS subtotal,
 								CASE 
 										WHEN  c.billing_addressID > 0 
 											THEN CONCAT(ba.address, ', ', ba.postcode,' ', ba.state, ', ', ba.city) 
@@ -611,6 +611,7 @@ if(isset($_POST['ordercode'],$_POST['action'])){
 				"PickUpDesc" => $PickUpDesc,
 				"billing_address" => $billing_address,
 				"shipping_address" => $shipping_address,
+				"recommendedBranch" => $row['recommendedBranch'],
 				"is_delivered" => $row['is_delivered'],
 				"payment_status" => $row['payment_status'],
 				"products"       => $products  

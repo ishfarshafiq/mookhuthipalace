@@ -133,8 +133,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST")
 	// }
 	
 
-	$insert="insert into checkout(customer_code, delivery_method, order_code, collecting_point, billing_addressID, shipping_addressID, bank_card_detailsID, payment_method, created_datetime) values 
-			('$customer_code', '$delivery_method', '$order_code', '$collect_branch', $billing_addressID, $shipping_addressID, $bank_card_detailsID, '$payment_method', '$date_time')";
+	$insert="insert into checkout(customer_code, delivery_method, order_code, collecting_point, billing_addressID, shipping_addressID, bank_card_detailsID, payment_method, recommendedBranch, created_datetime) values 
+			('$customer_code', '$delivery_method', '$order_code', '$collect_branch', $billing_addressID, $shipping_addressID, $bank_card_detailsID, '$payment_method', '$recommendedBranch', '$date_time')";
 	if(mysqli_query($conn,$insert))
 	{
 		$checkoutID  = mysqli_insert_id($conn);

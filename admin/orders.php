@@ -10,7 +10,6 @@ mysqli_query($conn, "update checkout set new_orders = '0' where new_orders = '1'
 <?php							
 	$filter = "WHERE MONTH(a.payment_date) = MONTH(CURRENT_DATE()) AND YEAR(a.payment_date) = YEAR(CURRENT_DATE())";
 
-
 	if (!empty($_GET['orderStatusFilter'])) {
 		$orderStatus = mysqli_real_escape_string($conn, $_GET['orderStatusFilter']);
 		$filter .= " AND a.is_delivered = '$orderStatus'";
@@ -329,6 +328,12 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
                         <div class="detail-label">Product</div>
                         <div class="detail-value" id="viewProduct">-</div>
                     </div>
+					
+					 <div class="modal-detail-item">
+                        <div class="detail-label">Recommended Branch</div>
+                        <div class="detail-value" id="viewRecommendedBranch">-</div>
+                    </div>
+					
                     <div class="row">
                         <div class="col-md-6">
                             <div class="modal-detail-item">

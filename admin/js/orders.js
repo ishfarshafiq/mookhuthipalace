@@ -29,6 +29,7 @@ function loadOrderDetailByOrderCode(ordercode)
 				document.getElementById('viewAmount').textContent = "RM " + (subtotal + delivery_fee).toFixed(2);
 				document.getElementById('viewDeliveryType').textContent = deliveryTypes[response.data.delivery_method];
 				document.getElementById('viewBillingAddress').textContent = response.data.billing_address;
+				document.getElementById('viewRecommendedBranch').textContent = response.data.recommendedBranch;
 				
 				if(response.data.delivery_method == "selfCollect")
 				{
