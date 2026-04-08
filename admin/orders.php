@@ -7,23 +7,45 @@ include_once('includes/authentication.php');
 mysqli_query($conn, "update checkout set new_orders = '0' where new_orders = '1';");
 ?>
 
-<?php							
-	$filter = "WHERE MONTH(a.payment_date) = MONTH(CURRENT_DATE()) AND YEAR(a.payment_date) = YEAR(CURRENT_DATE())";
+<?php		
 
-	if (!empty($_GET['orderStatusFilter'])) {
-		$orderStatus = mysqli_real_escape_string($conn, $_GET['orderStatusFilter']);
-		$filter .= " AND a.is_delivered = '$orderStatus'";
-	}
+							
+    // Start with base condition
+    $filter = "WHERE 1=1";
 
-	if (!empty($_GET['paymentStatusFilter'])) {
-		$paymentStatus = mysqli_real_escape_string($conn, $_GET['paymentStatusFilter']);
-		$filter .= " AND a.payment_status = '$paymentStatus'";
-	}
+   
+    if (!empty($_GET['orderDate'])) {
 
-	if (!empty($_GET['orderDate'])) {
-		$orderDate = $_GET['orderDate'];
-		$filter .= " AND DATE(a.payment_date) = '$orderDate'";
-	}
+        $timestamp = strtotime($_GET['orderDate']);
+
+        if ($timestamp !== false) {
+            $orderDate = date('Y-m-d', $timestamp);
+
+            
+            $filter .= " AND a.payment_date >= '$orderDate 00:00:00' 
+						 AND a.payment_date <= '$orderDate 23:59:59'";
+        }
+
+    } else {
+       
+        $filter .= " AND MONTH(a.payment_date) = MONTH(CURRENT_DATE()) 
+                     AND YEAR(a.payment_date) = YEAR(CURRENT_DATE())";
+    }
+
+    // Order Status
+    if (!empty($_GET['orderStatusFilter'])) {
+        $orderStatus = mysqli_real_escape_string($conn, $_GET['orderStatusFilter']);
+        $filter .= " AND a.is_delivered = '$orderStatus'";
+    }
+
+    // Payment Status
+    if (!empty($_GET['paymentStatusFilter'])) {
+        $paymentStatus = mysqli_real_escape_string($conn, $_GET['paymentStatusFilter']);
+        $filter .= " AND a.payment_status = '$paymentStatus'";
+    }
+
+					
+	
 ?>
 
 <?php
@@ -145,6 +167,14 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
                     <label class="form-label" style="color: var(--primary-blue); font-weight: 600;">Order Date</label>
                     <input type="date" id="orderDate" name="orderDate" class="form-control" value="<?= $_GET['orderDate'] ?? '' ?>" onchange="this.form.submit()">
                 </div>
+				
+				<div class="col-md-4 d-flex align-items-end">
+					<a href="<?= strtok($_SERVER["REQUEST_URI"], '?'); ?>" 
+					   class="btn btn-outline-secondary w-50">
+						<i class="bi bi-arrow-counterclockwise me-2"></i>
+						Reset Filters
+					</a>
+				</div>
             </div>
         </div>
 		

@@ -550,7 +550,7 @@ if(isset($_POST['ordercode'],$_POST['action'])){
 								LEFT JOIN shipping_address sa ON c.shipping_addressID = sa.shipping_addressID
 								INNER JOIN user_account ua ON a.userID = ua.userID
 								WHERE a.ordercode = '$ordercode'
-								GROUP BY a.ordercode, ua.name, c.delivery_method, c.payment_method, a.payment_status, c.collecting_point, a.payment_date, a.is_delivered, c.billing_addressID, c.shipping_addressID;");
+								GROUP BY a.ordercode, ua.name, c.delivery_method, c.payment_method, c.recommendedBranch, a.payment_status, c.collecting_point, a.payment_date, a.is_delivered, c.billing_addressID, c.shipping_addressID;");
 		
 		
 		if ($query && mysqli_num_rows($query) > 0) {
