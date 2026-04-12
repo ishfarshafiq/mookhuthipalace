@@ -531,7 +531,7 @@ if(isset($_POST['ordercode'],$_POST['action'])){
 										// WHERE a.ordercode = '$ordercode'
 										// GROUP BY a.ordercode, ua.name, c.delivery_method, c.payment_method, a.payment_status, c.collecting_point, a.payment_date, a.is_delivered");
 
-		$query = mysqli_query($conn, "SELECT a.ordercode, ua.name, c.delivery_method, c.billing_addressID, c.shipping_addressID, c.payment_method, c.recommendedBranch, a.payment_status, c.collecting_point, a.payment_date, a.is_delivered, SUM(b.quantity * b.price) AS subtotal,
+		$query = mysqli_query($conn, "SELECT a.ordercode, ua.name, ua.phone, c.delivery_method, c.billing_addressID, c.shipping_addressID, c.payment_method, c.recommendedBranch, a.payment_status, c.collecting_point, a.payment_date, a.is_delivered, SUM(b.quantity * b.price) AS subtotal,
 								CASE 
 										WHEN  c.billing_addressID > 0 
 											THEN CONCAT(ba.address, ', ', ba.postcode,' ', ba.state, ', ', ba.city) 
@@ -550,7 +550,7 @@ if(isset($_POST['ordercode'],$_POST['action'])){
 								LEFT JOIN shipping_address sa ON c.shipping_addressID = sa.shipping_addressID
 								INNER JOIN user_account ua ON a.userID = ua.userID
 								WHERE a.ordercode = '$ordercode'
-								GROUP BY a.ordercode, ua.name, c.delivery_method, c.payment_method, c.recommendedBranch, a.payment_status, c.collecting_point, a.payment_date, a.is_delivered, c.billing_addressID, c.shipping_addressID;");
+								GROUP BY a.ordercode, ua.name, ua.phone, c.delivery_method, c.payment_method, c.recommendedBranch, a.payment_status, c.collecting_point, a.payment_date, a.is_delivered, c.billing_addressID, c.shipping_addressID;");
 		
 		
 		if ($query && mysqli_num_rows($query) > 0) {
@@ -604,6 +604,7 @@ if(isset($_POST['ordercode'],$_POST['action'])){
 			$data = [
 				"ordercode" => $row['ordercode'],
 				"name" => $row['name'],
+				"phone" => $row['phone'],
 				"order_date" => date("M d, Y \a\t h:i A", strtotime($row['payment_date'])),
 				"subtotal"    => number_format((float)$row['subtotal'], 2, '.', ''),
 				"delivery_method" => $row['delivery_method'],

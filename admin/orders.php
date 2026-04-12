@@ -340,6 +340,12 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
                             </div>
                         </div>
                     </div>
+					
+					<div class="modal-detail-item">
+                        <div class="detail-label">Contact Number</div>
+                        <div class="detail-value" id="viewPhone">-</div>
+                    </div>
+					
                     <div class="row">
                         <div class="col-md-6">
                             <div class="modal-detail-item">

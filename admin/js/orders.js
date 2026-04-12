@@ -25,6 +25,7 @@ function loadOrderDetailByOrderCode(ordercode)
 				
 				document.getElementById('viewOrderId').textContent = response.data.ordercode;
 				document.getElementById('viewCustomer').textContent = response.data.name;
+				document.getElementById('viewPhone').textContent = response.data.phone;
 				document.getElementById('viewDate').textContent = response.data.order_date;
 				document.getElementById('viewAmount').textContent = "RM " + (subtotal + delivery_fee).toFixed(2);
 				document.getElementById('viewDeliveryType').textContent = deliveryTypes[response.data.delivery_method];

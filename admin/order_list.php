@@ -357,6 +357,10 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
                             </div>
                         </div>
                     </div>
+					<div class="modal-detail-item">
+                        <div class="detail-label">Contact Number</div>
+                        <div class="detail-value" id="viewPhone">-</div>
+                    </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="modal-detail-item">
@@ -374,6 +378,10 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
                     <div class="modal-detail-item">
                         <div class="detail-label">Product</div>
                         <div class="detail-value" id="viewProduct">-</div>
+                    </div>
+					<div class="modal-detail-item">
+                        <div class="detail-label">Recommended Branch</div>
+                        <div class="detail-value" id="viewRecommendedBranch">-</div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">

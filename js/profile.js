@@ -207,9 +207,7 @@ $("#signupForm").on("submit", function (e) {
 		$('#error_email').text("");
 	}
 
-    
-    const phonePattern = /^\+?60\d{8,9}$/;
-    if (!phonePattern.test(phone)) {
+    if (phone === "") {
 		$('#error_phone').text("Please enter valid phone number (Example: +60123456789)");
         error++; 
     }
@@ -217,6 +215,16 @@ $("#signupForm").on("submit", function (e) {
 	{
 		$('#error_phone').text("");
 	}
+	
+    // const phonePattern = /^\+?60\d{8,9}$/;
+    // if (!phonePattern.test(phone)) {
+		// $('#error_phone').text("Please enter valid phone number (Example: +60123456789)");
+        // error++; 
+    // }
+	// else
+	// {
+		// $('#error_phone').text("");
+	// }
 	
     if (password.length < 6) {
 		$('#error_password').text("Password must be at least 6 characters");
