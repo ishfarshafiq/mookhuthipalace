@@ -50,38 +50,17 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
         'Last Order'
     ]);
 
-    // $exportSql = "SELECT b.name, b.email, b.phone,
-										// COUNT(a.ordercode) AS total_orders,
-										// SUM(a.billamount) AS total_spent,
-										// MAX(a.payment_date) AS last_order
-										// FROM payment_transaction a
-										// INNER JOIN user_account b ON a.userID = b.userID
-										// WHERE a.payment_status = 'Paid'
-										// GROUP BY a.userID
-										// ORDER BY b.name";
-
-    $exportSql = "SELECT ua.userID, ua.name, ua.profile, ua.email, ua.phone,
-											COUNT(a.ordercode) AS total_orders,
-											SUM(
-												(b.quantity * b.price)
-											) 
-											+ SUM(
-												CASE 
-													WHEN LOWER(c.delivery_method) = 'standard' THEN 8
-													WHEN LOWER(c.delivery_method) = 'foreign' THEN 18
-													ELSE 0
-												END
-											) AS total_spent,
-											MAX(a.payment_date) AS last_order
+    $exportSql = "SELECT b.name, b.email, b.phone,
+										COUNT(a.ordercode) AS total_orders,
+										SUM(a.billamount) AS total_spent,
+										MAX(a.payment_date) AS last_order
 										FROM payment_transaction a
-										INNER JOIN orders b ON a.ordercode = b.order_code
-										INNER JOIN checkout c ON b.order_code = c.order_code
-										INNER JOIN user_account ua ON a.userID = ua.userID
-										WHERE a.payment_status IN ('Paid')
-										GROUP BY ua.userID
-										ORDER BY ua.name";
-	
-	$exportResult = mysqli_query($conn, $exportSql);
+										INNER JOIN user_account b ON a.userID = b.userID
+										WHERE a.payment_status = 'Paid'
+										GROUP BY a.userID
+										ORDER BY b.name";
+
+    $exportResult = mysqli_query($conn, $exportSql);
 
     while ($row = mysqli_fetch_assoc($exportResult)) {
 
@@ -226,42 +205,23 @@ $rowIndex = 0;
                     <tbody>
 					
 						<?php
-							// $sql = "SELECT b.userID, b.name, b.profile, b.email, b.phone,
-										// COUNT(a.ordercode) AS total_orders,
-										// SUM(a.billamount) AS total_spent,
-										// MAX(a.payment_date) AS last_order
-										// FROM payment_transaction a
-										// INNER JOIN user_account b ON a.userID = b.userID
-										// WHERE a.payment_status in ('Paid')";
-										
-								$sql="SELECT ua.userID, ua.name, ua.profile, ua.email, ua.phone,
-											COUNT(a.ordercode) AS total_orders,
-											SUM(
-												(b.quantity * b.price)
-											) 
-											+ SUM(
-												CASE 
-													WHEN LOWER(c.delivery_method) = 'standard' THEN 8
-													WHEN LOWER(c.delivery_method) = 'foreign' THEN 18
-													ELSE 0
-												END
-											) AS total_spent,
-											MAX(a.payment_date) AS last_order
+							$sql = "SELECT b.userID, b.name, b.profile, b.email, b.phone,
+										COUNT(a.ordercode) AS total_orders,
+										SUM(a.billamount) AS total_spent,
+										MAX(a.payment_date) AS last_order
 										FROM payment_transaction a
-										INNER JOIN orders b ON a.ordercode = b.order_code
-										INNER JOIN checkout c ON b.order_code = c.order_code
-										INNER JOIN user_account ua ON a.userID = ua.userID
-										WHERE a.payment_status IN ('Paid')";
+										INNER JOIN user_account b ON a.userID = b.userID
+										WHERE a.payment_status in ('Paid')";
 
 								if (!empty($search)) {
 									$search_safe = mysqli_real_escape_string($conn, $search);
-									$sql .= " AND (ua.name LIKE '%$search_safe%' 
-											  OR ua.email LIKE '%$search_safe%' 
-											  OR ua.phone LIKE '%$search_safe%')";
+									$sql .= " AND (b.name LIKE '%$search_safe%' 
+											  OR b.email LIKE '%$search_safe%' 
+											  OR b.phone LIKE '%$search_safe%')";
 								}
 
-								$sql .= " GROUP BY ua.userID
-										  ORDER BY ua.name
+								$sql .= " GROUP BY a.userID
+										  ORDER BY b.name
 										  LIMIT $limit OFFSET $offset";
 
 								$result = mysqli_query($conn, $sql);

@@ -119,6 +119,7 @@ include_once('includes/authentication.php');
                                 <tbody>
 								
 			<?php
+			
 			// $sql="SELECT a.ordercode, ua.name, c.delivery_method, c.payment_method, a.payment_status, c.collecting_point, a.payment_date, a.is_delivered, SUM(b.quantity * b.price) AS subtotal
 					// FROM payment_transaction a
 					// INNER JOIN orders b ON a.ordercode = b.order_code
@@ -127,14 +128,38 @@ include_once('includes/authentication.php');
 					// $filter
 					// GROUP BY a.ordercode
 					// ORDER BY b.ordersID DESC";
-					$result = mysqli_query($conn, "select * from payment_transaction WHERE MONTH(payment_date) = MONTH(CURRENT_DATE()) AND YEAR(payment_date) = YEAR(CURRENT_DATE()) order by payment_transactionID desc");
+					//$result = mysqli_query($conn, "select * from payment_transaction WHERE MONTH(payment_date) = MONTH(CURRENT_DATE()) AND YEAR(payment_date) = YEAR(CURRENT_DATE()) order by payment_transactionID desc");
+					
+					$sql = "SELECT a.ordercode, MAX(ua.name) AS name, MAX(c.delivery_method) AS delivery_method, MAX(a.payment_status) AS payment_status, MAX(a.payment_date) AS payment_date,
+									MAX(a.is_delivered) AS is_delivered, 
+									MAX(a.billamount) AS billamount,
+									SUM(b.quantity * b.price) AS subtotal,
+									MAX(b.ordersID) AS maxOrderID
+								FROM payment_transaction a
+								INNER JOIN orders b ON a.ordercode = b.order_code
+								INNER JOIN checkout c ON b.order_code = c.order_code
+								INNER JOIN user_account ua ON a.userID = ua.userID
+								WHERE MONTH(a.payment_date) = MONTH(CURRENT_DATE()) 
+								  AND YEAR(a.payment_date) = YEAR(CURRENT_DATE())
+								GROUP BY a.ordercode
+								ORDER BY maxOrderID DESC;";
+					$result = mysqli_query($conn,$sql);
 					while($row = mysqli_fetch_assoc($result)) {
+						
+						$delivery_fee = 0;
+						
+						$fees = [
+							"standard" => 8,
+							"foreign" => 18
+						];
+						
+						$delivery_fee = $fees[$row['delivery_method']] ?? 0;
 					
 			?>
 					<tr>
 						<td>#<?php echo $row['ordercode']; ?></td>
 						<td><?php echo $row['name']; ?></td>
-						<td>RM <?php echo number_format((float)$row['billamount'], 2, '.', ''); ?></td>
+						<td>RM <?php echo number_format((float)$row['subtotal'] + $delivery_fee, 2, '.', ''); ?></td>
 						<td><?php echo date("M d, Y  h:i A", strtotime($row['payment_date'])); ?></td>
 						<td>
 						<?php if($row['payment_status'] == "Paid"){ ?>

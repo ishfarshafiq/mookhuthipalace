@@ -76,10 +76,16 @@ if (isset($_POST['userID'], $_POST['orderCode'], $_POST['name'], $_POST['email']
         }
 
         
-        $order_sum_subtotal = 0;
-        $get_payment_method = "SELECT payment_method FROM checkout WHERE order_code='$order_code' LIMIT 1";
+        $order_sum_subtotal = 0; $delivery_fee=0;
+        $get_payment_method = "SELECT payment_method, delivery_method FROM checkout WHERE order_code='$order_code' LIMIT 1";
         $result_payment_method = mysqli_query($conn, $get_payment_method);
         $row_payment = mysqli_fetch_assoc($result_payment_method);
+		
+		$fees = [
+			"standard" => 8,
+			"foreign" => 18
+		];
+		$delivery_fee = $fees[$row_payment['delivery_method']] ?? 0;
 
         if ($row_payment['payment_method'] === "BANK") {
 
@@ -97,7 +103,7 @@ if (isset($_POST['userID'], $_POST['orderCode'], $_POST['name'], $_POST['email']
 				
 				$_SESSION['userID'] = $userID;
 				
-                $grandTotal = number_format($order_sum_subtotal, 2, '.', '');
+                $grandTotal = number_format($order_sum_subtotal + $delivery_fee, 2, '.', '');
                 
 				echo json_encode([
                     "status" => "success",

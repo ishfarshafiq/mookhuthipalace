@@ -14,17 +14,20 @@ mysqli_query($conn, "update checkout set new_orders = '0' where new_orders = '1'
     $filter = "WHERE 1=1";
 
    
-    if (!empty($_GET['orderDate'])) {
+	if (!empty($_GET['fromDate']) && !empty($_GET['toDate'])) {
+		
+		 $timestamp_fromDate = strtotime($_GET['fromDate']);
+		 $timestamp_toDate = strtotime($_GET['toDate']);
 
-        $timestamp = strtotime($_GET['orderDate']);
-
-        if ($timestamp !== false) {
-            $orderDate = date('Y-m-d', $timestamp);
+        if ($timestamp_fromDate !== false && $timestamp_toDate !== false) {
+            $fromDate = date('Y-m-d', $timestamp_fromDate);
+			$toDate = date('Y-m-d', $timestamp_toDate);
 
             
-            $filter .= " AND a.payment_date >= '$orderDate 00:00:00' 
-						 AND a.payment_date <= '$orderDate 23:59:59'";
+            $filter .= " AND a.payment_date >= '$fromDate 00:00:00' 
+						 AND a.payment_date <= '$toDate 23:59:59'";
         }
+
 
     } else {
        
@@ -163,11 +166,16 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
                     </select>
                 </div>
                
-                <div class="col-md-3">
-                    <label class="form-label" style="color: var(--primary-blue); font-weight: 600;">Order Date</label>
-                    <input type="date" id="orderDate" name="orderDate" class="form-control" value="<?= $_GET['orderDate'] ?? '' ?>" onchange="this.form.submit()">
+			   <div class="col-md-3">
+                    <label class="form-label" style="color: var(--primary-blue); font-weight: 600;">From Date</label>
+                    <input type="date" id="fromDate" name="fromDate" class="form-control" value="<?= $_GET['fromDate'] ?? '' ?>" onchange="this.form.submit()">
                 </div>
 				
+				<div class="col-md-3">
+                    <label class="form-label" style="color: var(--primary-blue); font-weight: 600;">To Date</label>
+                    <input type="date" id="toDate" name="toDate" class="form-control" value="<?= $_GET['toDate'] ?? '' ?>" onchange="this.form.submit()">
+                </div>
+			   
 				<div class="col-md-4 d-flex align-items-end">
 					<a href="<?= strtok($_SERVER["REQUEST_URI"], '?'); ?>" 
 					   class="btn btn-outline-secondary w-50">
