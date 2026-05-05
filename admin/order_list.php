@@ -23,11 +23,28 @@ $filter = "WHERE 1=1";
 		$paymentStatus = mysqli_real_escape_string($conn, $_GET['paymentStatusFilter']);
 		$filter .= " AND a.payment_status = '$paymentStatus'";
 	}
+	
+	if (!empty($_GET['fromDate']) && !empty($_GET['toDate'])) {
+		
+		 $timestamp_fromDate = strtotime($_GET['fromDate']);
+		 $timestamp_toDate = strtotime($_GET['toDate']);
 
-	if (!empty($_GET['orderDate'])) {
-		$orderDate = $_GET['orderDate'];
-		$filter .= " AND DATE(a.payment_date) = '$orderDate'";
-	}
+        if ($timestamp_fromDate !== false && $timestamp_toDate !== false) {
+            $fromDate = date('Y-m-d', $timestamp_fromDate);
+			$toDate = date('Y-m-d', $timestamp_toDate);
+
+            
+            $filter .= " AND a.payment_date >= '$fromDate 00:00:00' 
+						 AND a.payment_date <= '$toDate 23:59:59'";
+        }
+
+
+    } 
+
+	// if (!empty($_GET['orderDate'])) {
+		// $orderDate = $_GET['orderDate'];
+		// $filter .= " AND DATE(a.payment_date) = '$orderDate'";
+	// }
 
 
 ?>
@@ -35,7 +52,7 @@ $filter = "WHERE 1=1";
 <?php
 if (isset($_GET['export']) && $_GET['export'] == "1") {
 	
-	//echo "<script>alert($filter)</script>";
+	
 
     header('Content-Type: text/csv');
     header('Content-Disposition: attachment; filename="cust_orders_export.csv"');
@@ -52,19 +69,7 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
         'Amount',
         'Delivery Method'
     ]);
-
-    // $exportSql = "SELECT a.ordercode, ua.name, c.delivery_method, 
-                         // a.payment_status, a.payment_date, 
-                         // a.is_delivered, 
-                         // SUM(b.quantity * b.price) AS subtotal
-                  // FROM payment_transaction a
-                  // INNER JOIN orders b ON a.ordercode = b.order_code
-                  // INNER JOIN checkout c ON b.order_code = c.order_code
-                  // INNER JOIN user_account ua ON a.userID = ua.userID
-                  // $filter
-                  // GROUP BY a.ordercode
-                  // ORDER BY b.ordersID DESC";
-				  
+			  
 	$exportSql = "SELECT 
 								a.ordercode, 
 								ua.name, 
@@ -92,6 +97,21 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
     $exportResult = mysqli_query($conn, $exportSql);
 
     while ($row = mysqli_fetch_assoc($exportResult)) {
+		
+		$delivery_fee = 0;
+		
+		$delivery_method_desc = [
+								"selfCollect" => "Self Collect",
+								"standard" => "Standard",
+								"foreign" => "Singapore"
+							];
+						
+		$fees = [
+			"standard" => 8,
+			"foreign" => 18
+		];
+		
+		$delivery_fee = $fees[$row['delivery_method']] ?? 0;
 
         fputcsv($output, [
             $row['ordercode'],
@@ -99,8 +119,8 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
             $row['payment_date'],
             $row['is_delivered'],
             $row['payment_status'],
-            number_format($row['subtotal'], 2),
-            ($row['delivery_method'] == "selfCollect") ? "Self Collect" : "Delivery"
+            number_format($row['subtotal'] + $delivery_fee, 2),
+			$delivery_method_desc[$row['delivery_method']]
         ]);
     }
 
@@ -130,28 +150,26 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
 
     <!-- Main Content -->
     <div class="main-content">
+	<form method="GET" action="order_list.php">
         <div class="page-header">
             <div>
                 <h1 class="page-title"><i class="fas fa-shopping-bag"></i> Orders</h1>
                 <p class="page-subtitle">Track and manage all customer orders</p>
             </div>
-            <!--<button class="btn btn-primary">
-                <i class="fas fa-download"></i> Export Orders
-            </button>-->
+           
+			<!--<form method="GET">-->
 			
-			<form method="GET">
-			
-				<input type="hidden" name="userID" value="<?php echo $userID; ?>">
+				<!--<input type="hidden" name="userID" value="<?php //echo $userID; ?>">-->
 			
 				<button type="submit" name="export" value="1" class="btn btn-primary">
 					<i class="fas fa-download"></i> Export Orders
 				</button>
-			</form>
+			<!--</form>-->
 			
         </div>
 
         <!-- Filters -->
-		<form method="GET" action="order_list.php">
+		
 		
         <div class="filters-section">
 		
@@ -178,11 +196,24 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
                         <option value="Failed" <?= ($_GET['paymentStatusFilter'] ?? '')=='Failed'?'selected':'' ?>>Failed</option>
                     </select>
                 </div>
-               
-                <div class="col-md-3">
-                    <label class="form-label" style="color: var(--primary-blue); font-weight: 600;">Order Date</label>
-                    <input type="date" id="orderDate" name="orderDate" class="form-control" value="<?= $_GET['orderDate'] ?? '' ?>" onchange="this.form.submit()">
+				
+				 <div class="col-md-3">
+                    <label class="form-label" style="color: var(--primary-blue); font-weight: 600;">From Date</label>
+                    <input type="date" id="fromDate" name="fromDate" class="form-control" value="<?= $_GET['fromDate'] ?? '' ?>" onchange="this.form.submit()">
                 </div>
+				
+				<div class="col-md-3">
+                    <label class="form-label" style="color: var(--primary-blue); font-weight: 600;">To Date</label>
+                    <input type="date" id="toDate" name="toDate" class="form-control" value="<?= $_GET['toDate'] ?? '' ?>" onchange="this.form.submit()">
+                </div>
+               
+				<div class="col-md-4 d-flex align-items-end">
+					<a href="order_list.php?userID=<?php echo $userID;?>" 
+					   class="btn btn-outline-secondary w-50">
+						<i class="bi bi-arrow-counterclockwise me-2"></i>
+						Reset Filters
+					</a>
+				</div>
             </div>
         </div>
 		
@@ -203,15 +234,6 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
 				"Delivered"  => "success"
 			];
 			
-			// $sql="SELECT a.ordercode, ua.name, c.delivery_method, c.payment_method, a.payment_status, c.collecting_point, a.payment_date, a.is_delivered, SUM(b.quantity * b.price) AS subtotal
-					// FROM payment_transaction a
-					// INNER JOIN orders b ON a.ordercode = b.order_code
-					// INNER JOIN checkout c ON b.order_code = c.order_code
-					// INNER JOIN user_account ua ON a.userID = ua.userID
-					// $filter
-					// GROUP BY a.ordercode
-					// ORDER BY b.ordersID DESC";
-					
 					$sql="SELECT 
 								a.ordercode, 
 								ua.name, 

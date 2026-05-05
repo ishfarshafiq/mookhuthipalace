@@ -50,36 +50,67 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
         'Last Order'
     ]);
 
-    // $exportSql = "SELECT b.name, b.email, b.phone,
-										// COUNT(a.ordercode) AS total_orders,
-										// SUM(a.billamount) AS total_spent,
-										// MAX(a.payment_date) AS last_order
-										// FROM payment_transaction a
-										// INNER JOIN user_account b ON a.userID = b.userID
-										// WHERE a.payment_status = 'Paid'
-										// GROUP BY a.userID
-										// ORDER BY b.name";
+   
 
-    $exportSql = "SELECT ua.userID, ua.name, ua.profile, ua.email, ua.phone,
-											COUNT(a.ordercode) AS total_orders,
-											SUM(
-												(b.quantity * b.price)
-											) 
-											+ SUM(
-												CASE 
-													WHEN LOWER(c.delivery_method) = 'standard' THEN 8
-													WHEN LOWER(c.delivery_method) = 'foreign' THEN 18
-													ELSE 0
-												END
-											) AS total_spent,
-											MAX(a.payment_date) AS last_order
+    // $exportSql = "SELECT ua.userID, ua.name, ua.profile, ua.email, ua.phone,
+											// COUNT(a.ordercode) AS total_orders,
+											// SUM(
+												// (b.quantity * b.price)
+											// ) 
+											// + SUM(
+												// CASE 
+													// WHEN LOWER(c.delivery_method) = 'standard' THEN 8
+													// WHEN LOWER(c.delivery_method) = 'foreign' THEN 18
+													// ELSE 0
+												// END
+											// ) AS total_spent,
+											// MAX(a.payment_date) AS last_order
+										// FROM payment_transaction a
+										// INNER JOIN orders b ON a.ordercode = b.order_code
+										// INNER JOIN checkout c ON b.order_code = c.order_code
+										// INNER JOIN user_account ua ON a.userID = ua.userID
+										// WHERE a.payment_status IN ('Paid')
+										// GROUP BY ua.userID
+										// ORDER BY ua.name";
+	
+	$exportSql = "SELECT userID, name, profile, email, phone, SUM(total_spent) AS total_spent_by_customer, MAX(payment_date) AS last_order, COUNT(ordercode) AS total_orders
+									FROM (
+										SELECT 
+											a.ordercode, 
+											ua.userID,
+											ua.name,
+											ua.profile,
+											ua.email,
+											ua.phone,
+											a.payment_date,
+											SUM(b.quantity * b.price) + 
+											(CASE 
+												WHEN LOWER(c.delivery_method) = 'standard' THEN 8
+												WHEN LOWER(c.delivery_method) = 'foreign' THEN 18
+												ELSE 0
+											END) AS total_spent
 										FROM payment_transaction a
 										INNER JOIN orders b ON a.ordercode = b.order_code
 										INNER JOIN checkout c ON b.order_code = c.order_code
 										INNER JOIN user_account ua ON a.userID = ua.userID
-										WHERE a.payment_status IN ('Paid')
-										GROUP BY ua.userID
-										ORDER BY ua.name";
+										WHERE a.payment_status = 'Paid'
+										GROUP BY 
+													a.ordercode,
+													ua.name,
+													ua.profile,
+													ua.email,
+													ua.phone,
+													a.payment_date,
+													c.delivery_method
+												) x
+												GROUP BY 
+													name,
+													profile,
+													email,
+													phone
+												ORDER BY total_spent_by_customer DESC
+												LIMIT $limit OFFSET $offset
+										";
 	
 	$exportResult = mysqli_query($conn, $exportSql);
 
@@ -90,7 +121,7 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
             $row['email'],
             $row['phone'],
             $row['total_orders'],
-            number_format($row['total_spent'], 2),
+            number_format($row['total_spent_by_customer'], 2),
 			$row['last_order']
         ]);
     }
@@ -226,44 +257,55 @@ $rowIndex = 0;
                     <tbody>
 					
 						<?php
-							// $sql = "SELECT b.userID, b.name, b.profile, b.email, b.phone,
-										// COUNT(a.ordercode) AS total_orders,
-										// SUM(a.billamount) AS total_spent,
-										// MAX(a.payment_date) AS last_order
-										// FROM payment_transaction a
-										// INNER JOIN user_account b ON a.userID = b.userID
-										// WHERE a.payment_status in ('Paid')";
-										
-								$sql="SELECT ua.userID, ua.name, ua.profile, ua.email, ua.phone,
-											COUNT(a.ordercode) AS total_orders,
-											SUM(
-												(b.quantity * b.price)
-											) 
-											+ SUM(
-												CASE 
-													WHEN LOWER(c.delivery_method) = 'standard' THEN 8
-													WHEN LOWER(c.delivery_method) = 'foreign' THEN 18
-													ELSE 0
-												END
-											) AS total_spent,
-											MAX(a.payment_date) AS last_order
+								
+								$sql="SELECT userID, name, profile, email, phone, SUM(total_spent) AS total_spent_by_customer, MAX(payment_date) AS last_order, COUNT(ordercode) AS total_orders
+									FROM (
+										SELECT 
+											a.ordercode, 
+											ua.userID,
+											ua.name,
+											ua.profile,
+											ua.email,
+											ua.phone,
+											a.payment_date,
+											SUM(b.quantity * b.price) + 
+											(CASE 
+												WHEN LOWER(c.delivery_method) = 'standard' THEN 8
+												WHEN LOWER(c.delivery_method) = 'foreign' THEN 18
+												ELSE 0
+											END) AS total_spent
 										FROM payment_transaction a
 										INNER JOIN orders b ON a.ordercode = b.order_code
 										INNER JOIN checkout c ON b.order_code = c.order_code
 										INNER JOIN user_account ua ON a.userID = ua.userID
-										WHERE a.payment_status IN ('Paid')";
+										WHERE a.payment_status = 'Paid'";
 
 								if (!empty($search)) {
 									$search_safe = mysqli_real_escape_string($conn, $search);
-									$sql .= " AND (ua.name LIKE '%$search_safe%' 
-											  OR ua.email LIKE '%$search_safe%' 
-											  OR ua.phone LIKE '%$search_safe%')";
+									 $sql .= " AND (
+													ua.name LIKE '%$search_safe%' 
+													OR ua.email LIKE '%$search_safe%' 
+													OR ua.phone LIKE '%$search_safe%'
+												  )";
 								}
 
-								$sql .= " GROUP BY ua.userID
-										  ORDER BY ua.name
-										  LIMIT $limit OFFSET $offset";
-
+								$sql .= " GROUP BY 
+													a.ordercode,
+													ua.name,
+													ua.profile,
+													ua.email,
+													ua.phone,
+													a.payment_date,
+													c.delivery_method
+												) x
+												GROUP BY 
+													name,
+													profile,
+													email,
+													phone
+												ORDER BY total_spent_by_customer DESC
+												LIMIT $limit OFFSET $offset";
+										  
 								$result = mysqli_query($conn, $sql);
 							while($row = mysqli_fetch_assoc($result)) {
 								
@@ -306,7 +348,7 @@ $rowIndex = 0;
                             </td>
                             <td><?php echo $row['phone'];?></td>
                             <td><strong><?php echo $row['total_orders'];?></strong></td>
-                            <td><strong>RM <?php echo number_format((float)$row['total_spent'], 2, '.', '');?></strong></td>
+                            <td><strong>RM <?php echo number_format((float)$row['total_spent_by_customer'], 2, '.', '');?></strong></td>
                             <td><?php echo date("M d, Y", strtotime($row['last_order']));?></td>
                             <td>
                                 <div class="action-buttons">
