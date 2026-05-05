@@ -151,3 +151,38 @@ function loadUpdateFormByOrderCode(ordercode)
 
           
         }
+		
+function orders_exportCSV() {
+    const orderStatusFilter = document.getElementById('orderStatusFilter').value;
+    const paymentStatusFilter = document.getElementById('paymentStatusFilter').value;
+    const fromDate = document.getElementById('fromDate').value;
+    const toDate = document.getElementById('toDate').value;
+
+    const params = new URLSearchParams({
+        orderStatusFilter,
+        paymentStatusFilter,
+        fromDate,
+        toDate,
+        export: 1
+    });
+
+    window.open('export_order.php?' + params.toString(), '_blank');
+}
+
+function order_list_exportCSV() {
+    const orderStatusFilter = document.getElementById('orderStatusFilter').value;
+    const paymentStatusFilter = document.getElementById('paymentStatusFilter').value;
+    const fromDate = document.getElementById('fromDate').value;
+    const toDate = document.getElementById('toDate').value;
+	const userID = document.getElementById('userID').value;
+
+    const params = new URLSearchParams({
+        orderStatusFilter,
+        paymentStatusFilter,
+        fromDate,
+        toDate,
+        userID
+    });
+
+    window.open('export_order_list.php?' + params.toString(), '_blank');
+}

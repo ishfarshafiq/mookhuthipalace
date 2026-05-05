@@ -7,9 +7,7 @@ include_once('includes/authentication.php');
 mysqli_query($conn, "update checkout set new_orders = '0' where new_orders = '1';");
 ?>
 
-<?php		
-
-							
+<?php						
     // Start with base condition
     $filter = "WHERE 1=1";
 
@@ -51,89 +49,6 @@ mysqli_query($conn, "update checkout set new_orders = '0' where new_orders = '1'
 	
 ?>
 
-<?php
-if (isset($_GET['export']) && $_GET['export'] == "1") {
-	
-    header('Content-Type: text/csv');
-    header('Content-Disposition: attachment; filename="orders_export.csv"');
-
-    $output = fopen("php://output", "w");
-
-    // CSV Column Headers
-    fputcsv($output, [
-        'Order Code',
-        'Customer',
-        'Order Date',
-        'Status',
-        'Payment Status',
-        'Amount',
-        'Delivery Method'
-    ]);
-	
-	
-	  
-	$exportSql= "SELECT 
-						a.ordercode,
-						ua.name,
-						c.delivery_method,
-						c.payment_method,
-						a.payment_status,
-						c.collecting_point,
-						a.payment_date,
-						a.is_delivered,
-						SUM(b.quantity * b.price) AS subtotal
-					FROM payment_transaction a
-					INNER JOIN orders b ON a.ordercode = b.order_code
-					INNER JOIN checkout c ON b.order_code = c.order_code
-					INNER JOIN user_account ua ON a.userID = ua.userID
-					$filter
-					GROUP BY 
-						a.ordercode,
-						ua.name,
-						c.delivery_method,
-						c.payment_method,
-						a.payment_status,
-						c.collecting_point,
-						a.payment_date,
-						a.is_delivered
-					ORDER BY MAX(b.ordersID) DESC;";
-
-
-    $exportResult = mysqli_query($conn, $exportSql);
-
-    while ($row = mysqli_fetch_assoc($exportResult)) {
-		
-		$delivery_fee = 0;
-		
-		$delivery_method_desc = [
-								"selfCollect" => "Self Collect",
-								"standard" => "Standard",
-								"foreign" => "Singapore"
-							];
-						
-		$fees = [
-			"standard" => 8,
-			"foreign" => 18
-		];
-		
-		$delivery_fee = $fees[$row['delivery_method']] ?? 0;
-
-        fputcsv($output, [
-            $row['ordercode'],
-            $row['name'],
-            $row['payment_date'],
-            $row['is_delivered'],
-            $row['payment_status'],
-            number_format($row['subtotal'] + $delivery_fee, 2),
-			$delivery_method_desc[$row['delivery_method']]
-        ]);
-    }
-
-    fclose($output);
-    exit();
-}
-
-?>
 
 <html lang="en">
 
@@ -155,7 +70,7 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
 
     <!-- Main Content -->
     <div class="main-content">
-	<form method="GET">
+	<form method="GET" action="orders.php">
         <div class="page-header">
             <div>
                 <h1 class="page-title"><i class="fas fa-shopping-bag"></i> Orders</h1>
@@ -165,11 +80,11 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
                 <i class="fas fa-download"></i> Export Orders
             </button>-->
 			
-			<!--<form method="GET">-->
-				<button type="submit" name="export" value="1" class="btn btn-primary">
+			
+				<button type="button" name="export" value="1"  onclick="orders_exportCSV()" class="btn btn-primary">
 					<i class="fas fa-download"></i> Export Orders
 				</button>
-			<!--</form>-->
+			
 			
         </div>
 

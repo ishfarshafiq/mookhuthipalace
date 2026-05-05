@@ -291,6 +291,7 @@ $rowIndex = 0;
 
 								$sql .= " GROUP BY 
 													a.ordercode,
+													ua.userID,
 													ua.name,
 													ua.profile,
 													ua.email,
@@ -299,6 +300,7 @@ $rowIndex = 0;
 													c.delivery_method
 												) x
 												GROUP BY 
+													userID,	
 													name,
 													profile,
 													email,

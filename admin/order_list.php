@@ -161,7 +161,7 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
 			
 				<!--<input type="hidden" name="userID" value="<?php //echo $userID; ?>">-->
 			
-				<button type="submit" name="export" value="1" class="btn btn-primary">
+				<button type="button" name="export" value="1" onclick="order_list_exportCSV()" class="btn btn-primary">
 					<i class="fas fa-download"></i> Export Orders
 				</button>
 			<!--</form>-->
@@ -173,7 +173,7 @@ if (isset($_GET['export']) && $_GET['export'] == "1") {
 		
         <div class="filters-section">
 		
-		  <input type="hidden" name="userID" value="<?php echo $userID; ?>">
+		  <input type="hidden" name="userID" id="userID" value="<?php echo $userID; ?>">
 		
             <div class="row g-3">
                 <div class="col-md-3">
