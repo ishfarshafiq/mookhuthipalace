@@ -252,6 +252,7 @@ if(isset($_SESSION['userID']))
 								INNER JOIN category b ON a.categoryID = b.categoryID
 								INNER JOIN material c ON a.materialID = c.materialID
 								$where
+								ORDER BY a.productID DESC
 								LIMIT $start, $limit";
 		
 					$result = mysqli_query($conn,$sql);
